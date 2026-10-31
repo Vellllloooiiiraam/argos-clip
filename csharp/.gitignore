@@ -1,0 +1,12 @@
+# saídas de build
+bin/
+obj/
+installer/out/
+
+# dados de execução
+jobs/
+models/
+
+# IDE
+.vs/
+*.user

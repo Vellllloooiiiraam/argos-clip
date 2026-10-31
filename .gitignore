@@ -11,3 +11,7 @@ test/
 
 # segredos
 .env
+
+dist/
+build/
+*.spec.bak

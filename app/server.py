@@ -17,11 +17,14 @@ from fastapi.staticfiles import StaticFiles
 
 from . import pipeline as pl
 from . import downloader as dl
+from . import paths
 
 BASE = Path(__file__).resolve().parent.parent
 # Testes apontam ARGOS_JOBS_DIR para a pasta própria (nunca a de produção).
-JOBS = Path(os.environ.get("ARGOS_JOBS_DIR") or (BASE / "jobs"))
+# No .exe, jobs/ fica ao lado do executável (visível e limpo pelo usuário).
+JOBS = Path(os.environ.get("ARGOS_JOBS_DIR") or (paths.app_dir() / "jobs"))
 JOBS.mkdir(exist_ok=True, parents=True)
+STATIC = paths.static_dir()
 
 # estado em memória: job_id -> dict
 JOBS_STATE: dict[str, dict] = {}
@@ -288,10 +291,10 @@ async def media(job_id: str, name: str):
 
 @app.get("/")
 async def index():
-    return FileResponse(Path(__file__).parent / "static" / "index.html")
+    return FileResponse(STATIC / "index.html")
 
 
-app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
+app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 
 if __name__ == "__main__":

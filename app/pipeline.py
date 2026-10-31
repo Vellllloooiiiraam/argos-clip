@@ -11,12 +11,15 @@ from pathlib import Path
 
 from . import reframe as rf
 from . import broll as br
+from .paths import tool
 
 # ---------------------------------------------------------------------------
 # FFmpeg / ffprobe
 # ---------------------------------------------------------------------------
 
 def run(cmd: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess:
+    # resolve ffmpeg/ffprobe tanto no venv quanto dentro do .exe
+    cmd = [tool(cmd[0])] + list(cmd[1:]) if cmd and cmd[0] in {"ffmpeg", "ffprobe"} else cmd
     return subprocess.run(
         cmd, cwd=str(cwd) if cwd else None,
         capture_output=True, text=True, encoding="utf-8", errors="replace",

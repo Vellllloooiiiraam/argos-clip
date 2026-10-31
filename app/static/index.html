@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Argos Clip</title>
+<style>
+  :root {
+    --bg: #0b0b12; --card: #15141f; --border: #262436;
+    --accent: #7c5cff; --accent2: #b14bf4; --text: #eceaf5; --muted: #9a96b5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(1200px 600px at 70% -10%, #1d1233 0%, var(--bg) 55%);
+    color: var(--text); font-family: "Segoe UI", system-ui, sans-serif;
+    min-height: 100vh; padding: 32px 16px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 28px; }
+  header h1 {
+    font-size: 34px; font-weight: 800;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header p { color: var(--muted); margin-top: 6px; font-size: 14px; }
+
+  .drop {
+    border: 2px dashed var(--border); border-radius: 16px; padding: 48px 24px;
+    text-align: center; cursor: pointer; transition: .2s; background: var(--card);
+  }
+  .drop:hover, .drop.over { border-color: var(--accent); background: #1a1828; }
+  .drop .big { font-size: 20px; font-weight: 600; }
+  .drop .small { color: var(--muted); margin-top: 8px; font-size: 13px; }
+  .opts { display: flex; gap: 16px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+  .opts label { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .opts select, .opts input {
+    background: #100f18; color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 10px; font-size: 13px;
+  }
+  .linkrow {
+    display: flex; gap: 10px; margin-top: 14px; justify-content: center; flex-wrap: wrap;
+  }
+  .linkrow input {
+    flex: 1; min-width: 260px; max-width: 520px;
+    background: #100f18; color: var(--text); border: 1px solid var(--border);
+    border-radius: 10px; padding: 11px 14px; font-size: 14px;
+  }
+  .linkrow input:focus { outline: none; border-color: var(--accent); }
+  .linkrow button {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: #fff; border: none; border-radius: 10px; padding: 11px 22px;
+    font-weight: 700; font-size: 14px; cursor: pointer;
+  }
+  .linkrow button:hover { filter: brightness(1.15); }
+  .or { text-align: center; color: var(--muted); font-size: 12px; margin-top: 16px; }
+
+  .panel {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 24px; margin-top: 24px; display: none;
+  }
+  .panel.show { display: block; }
+  .stage { font-weight: 600; margin-bottom: 12px; }
+  .bar { height: 10px; background: #100f18; border-radius: 6px; overflow: hidden; }
+  .bar > div {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width .4s;
+  }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  .err { color: #ff6b81; font-weight: 600; margin-top: 10px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; margin-top: 18px; }
+  .clip {
+    background: #100f18; border: 1px solid var(--border); border-radius: 14px;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .clip .thumbwrap { position: relative; aspect-ratio: 9/16; background: #000; }
+  .clip video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .badge {
+    position: absolute; top: 10px; left: 10px; padding: 4px 10px;
+    border-radius: 999px; font-size: 12px; font-weight: 700; color: #fff;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .clip .meta { padding: 12px 14px; font-size: 13px; }
+  .clip .times { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+  .clip .txt { line-height: 1.4; max-height: 60px; overflow: hidden; }
+  .clip .reasons { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: #221f33; color: #c9c2f0; border-radius: 999px; padding: 3px 9px; font-size: 11px; }
+  .dl {
+    display: block; text-align: center; margin: 12px 14px 14px; padding: 9px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: #fff; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 13px;
+  }
+  .dl:hover { filter: brightness(1.15); }
+  .reset { display:block; margin: 24px auto 0; background:none; border:1px solid var(--border); color:var(--muted); padding:10px 22px; border-radius:10px; cursor:pointer; font-size:14px; }
+  .reset:hover { color: var(--text); border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>👁️ Argos Clip</h1>
+    <p>1 vídeo longo → N clipes virais com legenda. 100% local e gratuito (Whisper + FFmpeg).</p>
+  </header>
+
+  <div class="drop" id="drop">
+    <div class="big">🎬 Arraste um vídeo aqui ou clique para escolher</div>
+    <div class="small">MP4 · MOV · MKV · WEBM · AVI — nada sai do seu computador</div>
+    <div class="opts">
+      <label>Clipes:
+        <select id="nclips">
+          <option>3</option><option selected>5</option><option>7</option><option>10</option>
+        </select>
+      </label>
+      <label>Idioma:
+        <select id="lang">
+          <option value="" selected>Auto-detectar</option>
+          <option value="pt">Português</option>
+          <option value="en">Inglês</option>
+          <option value="es">Espanhol</option>
+        </select>
+      </label>
+    </div>
+    <input type="file" id="file" accept="video/*" hidden>
+  </div>
+
+  <div class="or">— ou cole um link —</div>
+  <div class="linkrow">
+    <input type="url" id="link" placeholder="https://www.youtube.com/watch?v=… (YouTube, Twitch, Vimeo, X…)" disabled>
+    <button id="linkbtn" disabled>⬇ Baixar do link</button>
+  </div>
+
+  <div class="panel" id="panel">
+    <div class="stage" id="stage">Enviando…</div>
+    <div class="bar"><div id="barfill"></div></div>
+    <div class="sub" id="sub"></div>
+    <div class="err" id="err" style="display:none"></div>
+  </div>
+
+  <div class="panel" id="results">
+    <div class="stage">Seus clipes ✨</div>
+    <div class="grid" id="grid"></div>
+    <button class="reset" id="reset">⬅ Processar outro vídeo</button>
+  </div>
+</div>
+
+<script>
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('file');
+const linkInput = document.getElementById('link');
+const linkBtn = document.getElementById('linkbtn');
+const panel = document.getElementById('panel');
+const results = document.getElementById('results');
+const grid = document.getElementById('grid');
+let polling = null;
+
+// habilita o campo de link (feature detect: servidor novo tem /api/link)
+linkInput.disabled = false;
+linkBtn.disabled = false;
+linkBtn.addEventListener('click', () => {
+  const url = linkInput.value.trim();
+  if (!url) { linkInput.focus(); return; }
+  startLink(url);
+});
+linkInput.addEventListener('keydown', e => { if (e.key === 'Enter') linkBtn.click(); });
+
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', e => {
+  e.preventDefault(); drop.classList.remove('over');
+  if (e.dataTransfer.files.length) start(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files.length) start(fileInput.files[0]); });
+
+document.getElementById('reset').addEventListener('click', () => {
+  results.classList.remove('show'); panel.classList.remove('show');
+  grid.innerHTML = ''; fileInput.value = '';
+});
+
+function setStage(stage, pct, sub) {
+  document.getElementById('stage').textContent = stage;
+  document.getElementById('barfill').style.width = (pct ?? 0) + '%';
+  document.getElementById('sub').textContent = sub || '';
+}
+
+async function start(file) {
+  results.classList.remove('show');
+  panel.classList.add('show');
+  document.getElementById('err').style.display = 'none';
+  setStage('Enviando vídeo…', 0, file.name);
+
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('n_clips', document.getElementById('nclips').value);
+  fd.append('language', document.getElementById('lang').value);
+
+  let res;
+  try {
+    res = await fetch('/api/upload', { method: 'POST', body: fd });
+  } catch { return showError('Servidor indisponível.'); }
+  if (!res.ok) {
+    const j = await res.json().catch(() => ({}));
+    return showError(j.detail || ('Erro no upload (' + res.status + ')'));
+  }
+  const { job_id } = await res.json();
+  polling = setInterval(() => poll(job_id), 1200);
+}
+
+async function startLink(url) {
+  results.classList.remove('show');
+  panel.classList.add('show');
+  document.getElementById('err').style.display = 'none';
+  setStage('Enviando link…', 0, url);
+
+  let res;
+  try {
+    res = await fetch('/api/link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url,
+        n_clips: document.getElementById('nclips').value,
+        language: document.getElementById('lang').value,
+      }),
+    });
+  } catch { return showError('Servidor indisponível.'); }
+  if (!res.ok) {
+    const j = await res.json().catch(() => ({}));
+    return showError(j.detail || ('Erro no link (' + res.status + ')'));
+  }
+  const { job_id } = await res.json();
+  polling = setInterval(() => poll(job_id), 1200);
+}
+
+function showError(msg) {
+  clearInterval(polling);
+  const e = document.getElementById('err');
+  e.textContent = '❌ ' + msg; e.style.display = 'block';
+  setStage('Falhou', 0, '');
+}
+
+const STATUS_PCT = { queued: 2, download: 30, probe: 35, audio: 40, transcribe: 55, render: 75, done: 100 };
+
+async function poll(jobId) {
+  let st;
+  try {
+    const r = await fetch('/api/status/' + jobId);
+    if (!r.ok) return showError('Job perdido.');
+    st = await r.json();
+  } catch { return; }
+
+  const base = STATUS_PCT[st.status] ?? 0;
+  if (st.status === 'download') {
+    setStage(st.stage, Math.min(30, (st.progress || 0) * 0.3), 'yt-dlp baixando direto do site…');
+  } else if (st.status === 'transcribe') {
+    setStage(st.stage, 45 + (st.progress || 0) * 0.25, 'Whisper processando em CPU…');
+  } else if (st.status === 'render') {
+    setStage(st.stage, 75 + (st.progress || 0) * 0.25, 'FFmpeg cortando e legendando…');
+  } else {
+    setStage(st.stage, base, st.file || '');
+  }
+
+  if (st.status === 'error') return showError(st.error || 'Erro desconhecido.');
+  if (st.status === 'done') { clearInterval(polling); render(st); }
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function render(st) {
+  setStage('Concluído!', 100, (st.clips?.length || 0) + ' clipes gerados');
+  grid.innerHTML = '';
+  (st.clips || []).forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'clip';
+    div.innerHTML = `
+      <div class="thumbwrap">
+        <video src="/media/${st.id}/${c.video}" controls preload="metadata"
+               ${c.thumb ? `poster="/media/${st.id}/${c.thumb}"` : ''}></video>
+        <div class="badge">🔥 ${c.score}</div>
+      </div>
+      <div class="meta">
+        <div class="times">${c.start} → ${c.end} · ${c.duration}s · ${c.words} palavras</div>
+        <div class="txt">${esc(c.text)}</div>
+        <div class="reasons">${(c.reasons || []).map(r => `<span class="chip">${esc(r)}</span>`).join('')}</div>
+      </div>
+      <a class="dl" href="/media/${st.id}/${c.video}" download="${c.video}">⬇ Baixar clipe ${c.index}</a>`;
+    grid.appendChild(div);
+  });
+  results.classList.add('show');
+  results.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# dependências e ambientes
+.venv/
+__pycache__/
+*.pyc
+
+# dados de execução (vídeos e clipes)
+jobs/
+test-jobs/
+tests/fixtures/
+test/
+
+# segredos
+.env

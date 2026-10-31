@@ -18,11 +18,31 @@ Ferramenta de clipes com IA que roda **100% local e gratuita** na sua máquina: 
 
 ## Uso
 
-1. Dê duplo clique em `iniciar.bat` (abre http://127.0.0.1:8484)
-2. Arraste um vídeo longo (podcast, aula, live…) **ou cole um link** de plataforma suportada
-3. Escolha quantos clipes e o idioma (ou auto)
-4. Aguarde — em CPU, ~1 min de áudio leva de 20–60 s para transcrever
-5. Baixe os clipes gerados (9:16, com legenda queimada e nota de "viralidade")
+### Opção 1 — exe (recomendado para quem só quer usar)
+
+1. Baixe o `argos-clip-win64.zip` em [Releases](../../releases) e descompacte
+2. Dê duplo clique em `argos-clip.exe` — abre http://127.0.0.1:8484 no navegador
+3. Arraste um vídeo ou cole um link; o resto é igual
+
+Não precisa de Python nem FFmpeg — tudo já vem dentro. Modelo Whisper (~500 MB) é baixado no primeiro uso (precisa de internet uma vez).
+
+### Opção 2 — fonte (para desenvolver)
+
+1. Python 3.11 + FFmpeg no PATH
+2. `python -m venv .venv` e instale as dependências (`pip install -r requirements.txt`)
+3. Dê duplo clique em `iniciar.bat` (abre http://127.0.0.1:8484)
+4. Arraste um vídeo longo (podcast, aula, live…) **ou cole um link** de plataforma suportada
+5. Escolha quantos clipes e o idioma (ou auto)
+6. Aguarde — em CPU, ~1 min de áudio leva de 20–60 s para transcrever
+7. Baixe os clipes gerados (9:16, com legenda queimada e nota de "viralidade")
+
+## Gerar o exe
+
+```
+build.bat
+```
+
+Gera `dist\argos-clip\argos-clip.exe` (pasta de ~800 MB com FFmpeg embutido) — compacte a pasta para distribuir.
 
 ## Testes
 

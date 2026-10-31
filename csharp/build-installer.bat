@@ -31,6 +31,9 @@ copy /y "%SRC_ffprobe%" "dist\tools\ffprobe.exe" >nul
 
 echo.
 echo [3/3] Compilando o instalador (Inno Setup)...
+REM nao empacotar dados de execucao que o app cria ao lado do exe
+if exist "dist\jobs" rd /s /q "dist\jobs"
+if exist "dist\models" rd /s /q "dist\models"
 set "ISCC="
 if exist "%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" set "ISCC=%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe"
 if not defined ISCC if exist "%ProgramFiles%\Inno Setup 6\ISCC.exe" set "ISCC=%ProgramFiles%\Inno Setup 6\ISCC.exe"

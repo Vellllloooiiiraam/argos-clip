@@ -42,7 +42,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 ; Todo o conteudo publicado (exe, dlls, runtimes, wwwroot, tools\ffmpeg...)
-Source: "{#DistDir}\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
+; NUNCA empacotar dados de execucao (jobs\, models\) que o app cria ao lado do exe.
+Source: "{#DistDir}\*"; DestDir: "{app}"; Excludes: "jobs\*,models\*,*.pdb"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"

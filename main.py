@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Ponto de entrada do Argos Clip (.exe e venv): sobe o servidor e abre o navegador."""
+"""Ponto de entrada do Argos Clip [CLIENTE LEGADO]: sobe o servidor e abre o navegador.
+
+LEGADO: esta implementação em Python está congelada e não recebe mais features
+nem correções. A linha ativa do projeto é a versão C# / .NET 8 em ``csharp/``.
+"""
 from __future__ import annotations
 
 import threading

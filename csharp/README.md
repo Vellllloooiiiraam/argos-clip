@@ -1,6 +1,10 @@
 # Argos Clip — versão Windows (C# / .NET 8)
 
+**Português** · [English](README.en.md)
+
 Porte do **argos-clip** (Python) para um app Windows nativo em **C# / .NET 8**.
+Esta é a **linha ativa e mantida** do projeto — todas as versões novas saem daqui
+(a versão Python na raiz é o **cliente legado**, congelado).
 Pega **1 vídeo longo** e gera **N clipes verticais 9:16** com **legenda karaoke
 queimada** — tudo **100% local** (Whisper + FFmpeg), sem enviar nada para a nuvem.
 

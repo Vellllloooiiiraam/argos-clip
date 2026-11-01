@@ -1,5 +1,7 @@
 # Argos Clip
 
+**Português** · [English](README.en.md)
+
 Ferramenta de clipes com IA que roda **100% local e gratuita** na sua máquina: transforma vídeos longos em clipes verticais com legenda.
 
 - **Entrada:** upload de vídeo **ou link** (YouTube, Twitch, Vimeo, X, Reddit, TikTok… via yt-dlp)
@@ -14,10 +16,10 @@ Ferramenta de clipes com IA que roda **100% local e gratuita** na sua máquina: 
 
 Este repositório tem **duas implementações** do mesmo app (mesmo pipeline e mesma interface):
 
-- **Python** (raiz do repositório) — versão original, com `faster-whisper`.
-- **C# / .NET 8** ([`csharp/`](csharp/)) — porte nativo para Windows, com executável e **instalador** próprios. Detalhes em [csharp/README.md](csharp/README.md).
+- **C# / .NET 8** ([`csharp/`](csharp/)) — **linha ativa e mantida**. App nativo para Windows, com executável e **instalador** próprios. Todas as versões novas saem por aqui. Detalhes em [csharp/README.md](csharp/README.md).
+- **Python** (raiz do repositório) — **cliente legado** (congelado). Era a versão original, com `faster-whisper`; não recebe mais features nem correções novas.
 
-Ambas sobem em `http://127.0.0.1:8484`. Veja a aba **[Releases](../../releases)** para baixar o exe/instalador de cada uma.
+Ambas sobem em `http://127.0.0.1:8484`. Veja a aba **[Releases](../../releases)** para baixar o exe/instalador. O histórico de mudanças está no [CHANGELOG](CHANGELOG.md).
 
 ## Requisitos
 

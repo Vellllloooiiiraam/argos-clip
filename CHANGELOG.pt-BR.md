@@ -10,6 +10,14 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
 
 [English](CHANGELOG.md) · **Português**
 
+## [1.2.5] — 2026-11-01
+
+### Alterado
+- **Controles (Clipes, Idioma, Modelo, Duração, Seleção por IA) saíram da área de
+  arrastar** e agora ficam num card próprio, logo abaixo. Antes, clicar em qualquer um
+  deles abria o seletor de arquivo por engano. A área de arrastar ficou limpa: só
+  arrasta o vídeo ou clica nela para escolher.
+
 ## [1.2.4] — 2026-11-01
 
 ### Corrigido
@@ -107,6 +115,7 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
   Whisper, seleção ciente de frases, reframe 9:16 por rosto, legenda karaoke queimada,
   B-roll opcional), com interface web local.
 
+[1.2.5]: ../../releases/tag/v1.2.5
 [1.2.4]: ../../releases/tag/v1.2.4
 [1.2.3]: ../../releases/tag/v1.2.3
 [1.2.2]: ../../releases/tag/v1.2.2

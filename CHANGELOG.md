@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 **English** · [Português](CHANGELOG.pt-BR.md)
 
+## [1.2.5] — 2026-11-01
+
+### Changed
+- **The controls (Clips, Language, Model, Duration, AI selection) moved out of the
+  drop area** into their own card just below it. Previously, clicking any of them also
+  opened the file picker by mistake. The drop area is now clean: drag a video onto it
+  or click it to choose one.
+
 ## [1.2.4] — 2026-11-01
 
 ### Fixed
@@ -108,6 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   sentence-aware selection, 9:16 face reframe, burned-in karaoke captions, optional
   B-roll), with a local web UI.
 
+[1.2.5]: ../../releases/tag/v1.2.5
 [1.2.4]: ../../releases/tag/v1.2.4
 [1.2.3]: ../../releases/tag/v1.2.3
 [1.2.2]: ../../releases/tag/v1.2.2

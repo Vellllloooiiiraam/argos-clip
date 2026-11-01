@@ -31,7 +31,11 @@
   .drop:hover, .drop.over { border-color: var(--accent); background: #1a1828; }
   .drop .big { font-size: 20px; font-weight: 600; }
   .drop .small { color: var(--muted); margin-top: 8px; font-size: 13px; }
-  .opts { display: flex; gap: 16px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+  .options {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 20px; margin-top: 14px;
+  }
+  .opts { display: flex; gap: 16px; justify-content: center; margin-top: 0; flex-wrap: wrap; }
   .opts label { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
   .opts select, .opts input {
     background: #100f18; color: var(--text); border: 1px solid var(--border);
@@ -142,6 +146,10 @@
   <div class="drop" id="drop">
     <div class="big">🎬 Arraste um vídeo aqui ou clique para escolher</div>
     <div class="small">MP4 · MOV · MKV · WEBM · AVI — nada sai do seu computador</div>
+    <input type="file" id="file" accept="video/*" hidden>
+  </div>
+
+  <div class="options">
     <div class="opts">
       <label>Clipes:
         <select id="nclips">
@@ -175,7 +183,6 @@
         <span>Seleção por IA <span id="llmhint" style="color:var(--muted)"></span></span>
       </label>
     </div>
-    <input type="file" id="file" accept="video/*" hidden>
   </div>
 
   <button class="cfgbtn" id="cfgbtn" type="button">⚙️ Configurar IA (grátis)</button>

@@ -10,6 +10,13 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
 
 [English](CHANGELOG.md) · **Português**
 
+## [1.2.4] — 2026-11-01
+
+### Corrigido
+- **Download por link (YouTube e outras plataformas) não funcionava** e terminava com
+  `error: no such option: --outtmpl`. O yt-dlp atual removeu essa opção; agora o app
+  usa `-o` (equivalente canônico). Baixar vídeo direto pela URL voltou a funcionar.
+
 ## [1.2.3] — 2026-11-01
 
 ### Adicionado
@@ -100,6 +107,7 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
   Whisper, seleção ciente de frases, reframe 9:16 por rosto, legenda karaoke queimada,
   B-roll opcional), com interface web local.
 
+[1.2.4]: ../../releases/tag/v1.2.4
 [1.2.3]: ../../releases/tag/v1.2.3
 [1.2.2]: ../../releases/tag/v1.2.2
 [1.2.1]: ../../releases/tag/v1.2.1

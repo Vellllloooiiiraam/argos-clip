@@ -89,7 +89,7 @@ public static partial class Downloader
             StandardErrorEncoding = System.Text.Encoding.UTF8,
         };
         void Arg(string a) => psi.ArgumentList.Add(a);
-        Arg("--outtmpl"); Arg(outTemplate);
+        Arg("-o"); Arg(outTemplate);
         Arg("-f"); Arg("bv*[ext=mp4][height<=1080]+ba[ext=m4a]/b[ext=mp4][height<=1080]/bv*[height<=1080]+ba/b");
         Arg("--merge-output-format"); Arg("mp4");
         Arg("--no-playlist");

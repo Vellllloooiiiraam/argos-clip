@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 **English** · [Português](CHANGELOG.pt-BR.md)
 
+## [1.2.4] — 2026-11-01
+
+### Fixed
+- **Download by link (YouTube and other platforms) failed** with
+  `error: no such option: --outtmpl`. Current yt-dlp dropped that option; the app now
+  uses `-o` (its canonical equivalent). Downloading a video from a URL works again.
+
 ## [1.2.3] — 2026-11-01
 
 ### Added
@@ -101,6 +108,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   sentence-aware selection, 9:16 face reframe, burned-in karaoke captions, optional
   B-roll), with a local web UI.
 
+[1.2.4]: ../../releases/tag/v1.2.4
 [1.2.3]: ../../releases/tag/v1.2.3
 [1.2.2]: ../../releases/tag/v1.2.2
 [1.2.1]: ../../releases/tag/v1.2.1

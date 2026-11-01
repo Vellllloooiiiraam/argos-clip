@@ -5,7 +5,7 @@
 ; ===========================================================================
 
 #define AppName        "Argos Clip"
-#define AppVersion     "1.2.3"
+#define AppVersion     "1.2.4"
 #define AppPublisher   "Argos Clip"
 #define AppExeName     "argos-clip.exe"
 #define DistDir        "..\dist"

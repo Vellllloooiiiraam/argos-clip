@@ -1,4 +1,5 @@
 using System.Text.Json;
+using ArgosClip.Pipeline;
 using Microsoft.AspNetCore.Http;
 
 namespace ArgosClip;
@@ -16,6 +17,17 @@ public static class Endpoints
 
     public static void Map(WebApplication app, JobStore store, JobQueue queue, ArgosPipeline pipeline)
     {
+        app.MapGet("/api/config", () => Results.Json(new Dictionary<string, object?>
+        {
+            ["llm_available"] = LlmSelector.Available,
+            ["llm_model"] = LlmSelector.Available ? LlmSelector.Model : null,
+            ["whisper_model"] = Transcriber.DefaultModelName,
+            ["whisper_models"] = new[] { "tiny", "base", "small", "medium", "large-v3-turbo" },
+            ["min_clip_s"] = ClipOptions.Defaults().MinLen,
+            ["max_clip_s"] = ClipOptions.Defaults().MaxLen,
+            ["default_clips"] = 5,
+        }));
+
         app.MapPost("/api/upload", async (HttpRequest request) =>
         {
             IFormCollection form;
@@ -46,6 +58,12 @@ public static class Endpoints
 
             var n = ParseClips(form["n_clips"].ToString());
             var language = form["language"].ToString();
+            var options = ClipOptions.FromRequest(
+                n,
+                form["min_s"].ToString(),
+                form["max_s"].ToString(),
+                form["model"].ToString(),
+                ParseBool(form["use_llm"].ToString()));
 
             var jobId = NewJobId();
             var jobDir = Directory.CreateDirectory(Path.Combine(AppPaths.JobsDir, jobId));
@@ -77,7 +95,7 @@ public static class Endpoints
             }
 
             store.Add(jobId, NewState(jobId, "queued", "Na fila...", name));
-            queue.Enqueue(jobId, () => pipeline.Process(jobId, new FileInfo(dst), n, string.IsNullOrWhiteSpace(language) ? null : language));
+            queue.Enqueue(jobId, () => pipeline.Process(jobId, new FileInfo(dst), options, string.IsNullOrWhiteSpace(language) ? null : language));
             return Results.Json(new Dictionary<string, object?> { ["job_id"] = jobId });
         });
 
@@ -92,6 +110,7 @@ public static class Endpoints
             string url;
             int n;
             string? language;
+            ClipOptions options;
             try
             {
                 using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(raw) ? "{}" : raw);
@@ -108,6 +127,12 @@ public static class Endpoints
                 language = root.TryGetProperty("language", out var lg) && lg.ValueKind == JsonValueKind.String
                     ? lg.GetString()
                     : null;
+                options = ClipOptions.FromRequest(
+                    n,
+                    JsonField(root, "min_s"),
+                    JsonField(root, "max_s"),
+                    JsonField(root, "model"),
+                    ParseBool(JsonField(root, "use_llm")));
             }
             catch
             {
@@ -134,7 +159,7 @@ public static class Endpoints
                     store.Get(jobId)?.Set(("status", "download"), ("stage", "Baixando do link..."));
                     var src = Downloader.Download(url, jobDir, (p, msg) =>
                         store.Get(jobId)?.Set(("progress", Math.Round(p, 1)), ("stage", msg)));
-                    pipeline.Process(jobId, src, n, string.IsNullOrWhiteSpace(language) ? null : language);
+                    pipeline.Process(jobId, src, options, string.IsNullOrWhiteSpace(language) ? null : language);
                 }
                 catch (Exception e)
                 {
@@ -185,6 +210,29 @@ public static class Endpoints
     {
         if (int.TryParse(s, out var v)) return Math.Max(1, Math.Min(10, v));
         return 5;
+    }
+
+    private static bool? ParseBool(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return null;
+        s = s.Trim().ToLowerInvariant();
+        if (s is "1" or "true" or "on" or "sim" or "yes") return true;
+        if (s is "0" or "false" or "off" or "nao" or "não" or "no") return false;
+        return null;
+    }
+
+    /// <summary>Lê um campo de texto/valor do corpo JSON como string (ou null).</summary>
+    private static string? JsonField(JsonElement root, string name)
+    {
+        if (!root.TryGetProperty(name, out var el)) return null;
+        return el.ValueKind switch
+        {
+            JsonValueKind.String => el.GetString(),
+            JsonValueKind.True => "true",
+            JsonValueKind.False => "false",
+            JsonValueKind.Null => null,
+            _ => el.ToString(),
+        };
     }
 
     private static string ContentTypeFor(string path) => Path.GetExtension(path).ToLowerInvariant() switch

@@ -46,7 +46,7 @@ Abre o app e o navegador em `http://127.0.0.1:8484`. Feche a janela (ou `Ctrl+C`
 ### 3. Usar
 
 1. **Arraste** um vídeo (MP4/MOV/MKV/WEBM/AVI) **ou cole um link** (YouTube, Twitch, Vimeo, X, TikTok…).
-2. Escolha a quantidade de clipes (3/5/7/10) e o idioma (ou auto-detectar).
+2. Ajuste as opções: quantidade de clipes, idioma, **modelo do Whisper**, **duração mín/máx** e **seleção por IA** (se configurada).
 3. Aguarde: transcrição → escolha dos melhores momentos → render 9:16 com legenda.
 4. Baixe os clipes na própria tela.
 
@@ -61,14 +61,35 @@ o vídeo e confere se os clipes foram gerados (smoke test de ponta a ponta).
 
 ---
 
+## Opções de seleção
+
+Os cortes são feitos **em fronteiras de frase** (nunca no meio de uma ideia): os
+segmentos do Whisper viram frases e cada clipe agrupa frases inteiras dentro de
+`[duração mín, duração máx]`.
+
+| Opção | Padrão | O que faz |
+|---|---|---|
+| **Clipes** | 5 | quantos clipes gerar (1–10) |
+| **Modelo** | `small` | modelo do Whisper — `tiny`/`base` são rápidos; `medium`/`large-v3-turbo` são mais precisos (e mais lentos) |
+| **Duração (s)** | 20 até 60 | faixa de duração de cada clipe |
+| **Seleção por IA** | desligada | usa o **Gemini** para escolher os melhores momentos (precisa de chave — ver abaixo) |
+
+Sem chave de IA, a seleção é a **heurística local** (ganchos, números,
+perguntas, abertura forte, densidade de fala). Com a chave, o Gemini lê a
+transcrição, escolhe os trechos e a heurística ainda entra como segunda opinião
+para completar as vagas — **se a IA falhar, o job continua na heurística**.
+
+---
+
 ## Como funciona (pipeline)
 
 ```
 upload/link ──► ffprobe (duração/áudio)
              ──► ffmpeg extrai áudio 16 kHz mono WAV
              ──► Whisper (local) transcreve COM timestamps por palavra
-             ──► Scoring: agrupa trechos e escolhe os N melhores
-                 (ganchos, números, perguntas, densidade de fala)
+             ──► frases: corta em pontuação final/pausa (nunca no meio)
+             ──► seleção: IA (Gemini, opcional) OU heurística
+                 agrupa frases inteiras em [mín, máx] e escolhe os N melhores
              ──► B-roll opcional (Pexels/Pixabay) — só se houver chave
              ──► Reframe 9:16: rastreia o rosto (OpenCV) e corta seguindo
              ──► ffmpeg: crop + scale 1080x1920 + legenda ASS karaoke + thumb
@@ -94,7 +115,11 @@ Rotas e variáveis de ambiente são as mesmas do original.
 
 | Variável | Padrão | Para que serve |
 |---|---|---|
-| `ARGOS_WHISPER_MODEL` | `small` | `tiny` \| `base` \| `small` \| `medium` \| `large-v3` |
+| `ARGOS_WHISPER_MODEL` | `small` | `tiny` \| `base` \| `small` \| `medium` \| `large-v3-turbo` |
+| `ARGOS_MIN_CLIP_S` | `20` | duração mínima de cada clipe (s) |
+| `ARGOS_MAX_CLIP_S` | `60` | duração máxima de cada clipe (s) |
+| `ARGOS_LLM_KEY` | — | chave do Google Gemini; **liga a seleção por IA**. Também aceita `ARGOS_GEMINI_KEY`, `GEMINI_API_KEY` ou `GOOGLE_API_KEY` |
+| `ARGOS_LLM_MODEL` | `gemini-2.0-flash` | modelo do Gemini usado na seleção |
 | `ARGOS_PORT` | `8484` | porta do app. **Sem ela, o app usa a 8484 e, se estiver ocupada, escolhe a próxima livre sozinho** |
 | `ARGOS_MAX_ACTIVE_JOBS` | `2` | jobs processando ao mesmo tempo |
 | `ARGOS_JOB_TTL_HOURS` | `24` | horas até apagar jobs concluídos |
@@ -111,6 +136,16 @@ set ARGOS_WHISPER_MODEL=base
 iniciar.bat
 ```
 
+Exemplo: ligar a seleção por IA (Gemini)
+
+```bat
+set ARGOS_LLM_KEY=sua_chave_do_google_ai_studio
+iniciar.bat
+```
+
+> A chave grátis do Gemini sai em https://aistudio.google.com/apikey. Com ela
+> setada, a caixa **“Seleção por IA”** já vem marcada na interface.
+
 ---
 
 ## Gerar o instalador (para distribuir)
@@ -120,7 +155,7 @@ winget install JRSoftware.InnoSetup   :: uma vez só
 build-installer.bat
 ```
 
-Gera `installer\out\ArgosClip-Setup-1.1.0.exe` (~194 MB). O instalador:
+Gera `installer\out\ArgosClip-Setup-1.2.0.exe` (~194 MB). O instalador:
 
 - instala **por usuário** (não pede admin) em `%LocalAppData%\Programs\Argos Clip`;
 - cria atalhos no Menu Iniciar (e Desktop, opcional);
@@ -152,12 +187,13 @@ argos-clip-csharp\
    ├─ Endpoints.cs             # /api/upload, /api/link, /api/status, /media
    ├─ Jobs.cs                  # estado + fila de jobs
    ├─ ArgosPipeline.cs         # orquestra o pipeline
+   ├─ ClipOptions.cs           # opções do job (clipes/duração/modelo/IA)
    ├─ Downloader.cs            # yt-dlp + anti-SSRF
    ├─ AppPaths.cs              # caminhos (dev e publicado)
    ├─ wwwroot\index.html       # interface (a mesma do original)
    ├─ tools\                   # yt-dlp.exe + cascata Haar
    └─ Pipeline\
-      ├─ Ffmpeg.cs  Transcriber.cs  Scoring.cs
+      ├─ Ffmpeg.cs  Transcriber.cs  Scoring.cs  LlmSelector.cs
       ├─ Karaoke.cs  Reframe.cs  Renderer.cs  Broll.cs  Models.cs
 ```
 

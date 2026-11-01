@@ -4,7 +4,7 @@ Ferramenta de clipes com IA que roda **100% local e gratuita** na sua máquina: 
 
 - **Entrada:** upload de vídeo **ou link** (YouTube, Twitch, Vimeo, X, Reddit, TikTok… via yt-dlp)
 - **Transcrição:** Whisper via `faster-whisper` (CPU, int8, modelo `small`)
-- **Seleção de momentos:** heurística de scoring (ganchos, números, perguntas, densidade de fala)
+- **Seleção de momentos:** cortes **em fronteiras de frase** + heurística de scoring (ganchos, números, perguntas, densidade de fala) e, **opcionalmente**, seleção por IA (Google Gemini) via `ARGOS_LLM_KEY`
 - **Reframe por rosto:** OpenCV rastreia o falante e o crop 9:16 segue o rosto (fallback: crop central)
 - **B-Roll automático (opcional):** busca clipe stock no Pexels/Pixabay e sobrepõe no meio do clipe
 - **Clipes:** FFmpeg recorta para 9:16 (1080×1920) e queima legenda estilo karaoke

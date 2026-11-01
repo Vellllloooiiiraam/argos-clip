@@ -23,7 +23,7 @@ public sealed class ArgosPipeline
         _store.Get(jobId)?.Set(kv);
     }
 
-    public void Process(string jobId, FileInfo src, int nClips, string? language)
+    public void Process(string jobId, FileInfo src, ClipOptions opt, string? language)
     {
         try
         {
@@ -47,21 +47,46 @@ public sealed class ArgosPipeline
             Set(jobId, ("status", "audio"), ("stage", "Extraindo áudio..."));
             var wav = Ffmpeg.ExtractAudio(jobDir, src);
 
-            Set(jobId, ("status", "transcribe"), ("stage", "Transcrevendo com Whisper (local)..."), ("progress", 0.0));
+            Set(jobId,
+                ("status", "transcribe"),
+                ("stage", $"Transcrevendo com Whisper '{opt.Model}' (local)..."),
+                ("progress", 0.0));
 
-            var segments = Transcriber.Transcribe(wav, language, info.Duration, p => Set(jobId, ("progress", Math.Round(p, 1))));
+            var segments = Transcriber.Transcribe(
+                wav, language, info.Duration,
+                p => Set(jobId, ("progress", Math.Round(p, 1))),
+                opt.Model);
             if (segments.Count == 0)
             {
                 throw new InvalidOperationException("Nenhuma fala detectada no áudio.");
             }
             Set(jobId, ("transcript_segments", segments.Count), ("stage", "Escolhendo os melhores momentos..."));
 
-            var chunks = Scoring.BuildChunks(segments);
-            var chosen = Scoring.SelectClips(chunks, nClips);
+            // A: frases limpas → candidatos agrupados em [minLen, maxLen]
+            var sentences = Scoring.SplitSentences(segments, opt.MaxLen);
+            var chunks = Scoring.GroupSentences(sentences, opt.MinLen, opt.MaxLen);
+
+            // C: seleção por IA (Gemini) quando habilitada; senão heurística pura.
+            List<Clip> chosen;
+            string selectionMode;
+            var llmPicks = opt.UseLlm
+                ? LlmSelector.Select(sentences, opt, chunks, msg => Console.WriteLine(msg))
+                : null;
+            if (llmPicks is { Count: > 0 })
+            {
+                chosen = llmPicks;
+                selectionMode = "IA (Gemini)";
+            }
+            else
+            {
+                chosen = Scoring.SelectClips(chunks, opt.NClips, opt.MinLen, opt.MaxLen);
+                selectionMode = opt.UseLlm ? "heurística (IA indisponível)" : "heurística";
+            }
             if (chosen.Count == 0)
             {
                 throw new InvalidOperationException("Não foi possível montar clipes a partir da transcrição.");
             }
+            Set(jobId, ("selection", selectionMode));
 
             var maxScore = chosen.Max(c => c.Score);
 

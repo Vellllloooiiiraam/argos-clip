@@ -120,6 +120,24 @@
           <option value="es">Espanhol</option>
         </select>
       </label>
+      <label>Modelo:
+        <select id="model">
+          <option value="tiny">tiny (rápido)</option>
+          <option value="base">base</option>
+          <option value="small" selected>small (recomendado)</option>
+          <option value="medium">medium (mais preciso)</option>
+          <option value="large-v3-turbo">large-v3-turbo (melhor)</option>
+        </select>
+      </label>
+      <label>Duração (s):
+        <input type="number" id="mins" value="20" min="5" max="150" step="1" style="width:64px">
+        <span style="color:var(--muted)">até</span>
+        <input type="number" id="maxs" value="60" min="10" max="180" step="1" style="width:64px">
+      </label>
+      <label id="llmlabel" title="Usa o Google Gemini para escolher os melhores momentos">
+        <input type="checkbox" id="usellm">
+        <span>Seleção por IA <span id="llmhint" style="color:var(--muted)"></span></span>
+      </label>
     </div>
     <input type="file" id="file" accept="video/*" hidden>
   </div>
@@ -153,6 +171,32 @@ const panel = document.getElementById('panel');
 const results = document.getElementById('results');
 const grid = document.getElementById('grid');
 let polling = null;
+
+// Carrega a configuração do servidor (IA disponível? durações padrão?).
+fetch('/api/config').then(r => r.ok ? r.json() : null).then(cfg => {
+  if (!cfg) return;
+  const box = document.getElementById('usellm');
+  if (cfg.llm_available) {
+    box.checked = true;
+    document.getElementById('llmhint').textContent = '(Gemini)';
+  } else {
+    box.disabled = true;
+    document.getElementById('llmhint').textContent = '(configure ARGOS_LLM_KEY)';
+  }
+  if (cfg.min_clip_s) document.getElementById('mins').value = Math.round(cfg.min_clip_s);
+  if (cfg.max_clip_s) document.getElementById('maxs').value = Math.round(cfg.max_clip_s);
+}).catch(() => {});
+
+function selOptions() {
+  return {
+    n_clips: document.getElementById('nclips').value,
+    language: document.getElementById('lang').value,
+    model: document.getElementById('model').value,
+    min_s: document.getElementById('mins').value,
+    max_s: document.getElementById('maxs').value,
+    use_llm: document.getElementById('usellm').checked ? 'true' : 'false',
+  };
+}
 
 linkBtn.addEventListener('click', () => {
   const url = linkInput.value.trim();
@@ -189,8 +233,8 @@ async function start(file) {
 
   const fd = new FormData();
   fd.append('file', file);
-  fd.append('n_clips', document.getElementById('nclips').value);
-  fd.append('language', document.getElementById('lang').value);
+  const o = selOptions();
+  for (const k in o) fd.append(k, o[k]);
 
   let res;
   try {
@@ -219,6 +263,10 @@ async function startLink(url) {
         url,
         n_clips: document.getElementById('nclips').value,
         language: document.getElementById('lang').value,
+        model: document.getElementById('model').value,
+        min_s: document.getElementById('mins').value,
+        max_s: document.getElementById('maxs').value,
+        use_llm: document.getElementById('usellm').checked,
       }),
     });
   } catch { return showError('Servidor indisponível.'); }
@@ -265,7 +313,7 @@ async function poll(jobId) {
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
 function render(st) {
-  setStage('Concluído!', 100, (st.clips?.length || 0) + ' clipes gerados');
+  setStage('Concluído!', 100, (st.clips?.length || 0) + ' clipes · seleção: ' + (st.selection || 'heurística'));
   grid.innerHTML = '';
   (st.clips || []).forEach(c => {
     const div = document.createElement('div');

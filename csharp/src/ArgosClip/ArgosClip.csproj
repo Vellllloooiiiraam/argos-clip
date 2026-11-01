@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>ArgosClip</RootNamespace>
     <AssemblyName>argos-clip</AssemblyName>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <InvariantGlobalization>false</InvariantGlobalization>
     <PlatformTarget>x64</PlatformTarget>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>

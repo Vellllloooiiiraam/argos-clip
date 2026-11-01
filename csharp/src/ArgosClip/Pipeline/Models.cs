@@ -11,6 +11,20 @@ public sealed record ArgosSegment(
     public IReadOnlyList<ArgosWord> WordList => Words ?? Array.Empty<ArgosWord>();
 }
 
+/// <summary>
+/// Uma frase (ou pedaço de frase muito longa) com fronteiras "limpas".
+/// É a unidade de montagem dos clipes: nunca cortamos no meio de uma frase.
+/// </summary>
+public sealed record ArgosSentence(
+    int Index,
+    double Start,
+    double End,
+    string Text,
+    IReadOnlyList<ArgosWord> Words)
+{
+    public double Duration => End - Start;
+}
+
 public sealed class Clip
 {
     public Clip(double start, double end, string text, IReadOnlyList<ArgosWord> words)

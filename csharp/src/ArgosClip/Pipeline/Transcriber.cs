@@ -13,31 +13,43 @@ namespace ArgosClip.Pipeline;
 public static class Transcriber
 {
     private static readonly object ModelLock = new();
-    private static WhisperFactory? _model;
-    private static string _loadedModelName = "";
+    private static readonly Dictionary<string, WhisperFactory> Cache = new(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>Nome do modelo (small/medium/large-v3). Ajustável por env.</summary>
-    public static string ModelName =>
+    /// <summary>Modelos GGML aceitos (espelham os disponíveis no whisper.cpp).</summary>
+    private static readonly string[] ValidModels =
+    [
+        "tiny", "tiny.en", "base", "base.en", "small", "small.en",
+        "medium", "medium.en", "large-v3", "large-v3-turbo", "large-v2", "large-v1", "large",
+    ];
+
+    /// <summary>Nome do modelo padrão (ajustável por ARGOS_WHISPER_MODEL).</summary>
+    public static string DefaultModelName =>
         Environment.GetEnvironmentVariable("ARGOS_WHISPER_MODEL")?.Trim() is { Length: > 0 } m
+        && IsValidModel(m)
             ? m.ToLowerInvariant()
             : "small";
 
-    public static WhisperFactory GetModel()
+    public static bool IsValidModel(string name) =>
+        ValidModels.Contains(name, StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Carrega (e cacheia) um modelo por nome. Vários modelos podem coexistir na
+    /// memória durante a vida do processo (small + medium, por exemplo).
+    /// </summary>
+    public static WhisperFactory GetModel(string? name = null)
     {
-        var name = ModelName;
+        var model = string.IsNullOrWhiteSpace(name) || !IsValidModel(name!)
+            ? DefaultModelName
+            : name!.ToLowerInvariant();
+
         lock (ModelLock)
         {
-            if (_model is not null && string.Equals(_loadedModelName, name, StringComparison.Ordinal))
-            {
-                return _model;
-            }
-            _model?.Dispose();
-            _model = null;
+            if (Cache.TryGetValue(model, out var cached)) return cached;
 
-            var path = GetOrDownloadModel(name).FullName;
-            _model = WhisperFactory.FromPath(path);
-            _loadedModelName = name;
-            return _model;
+            var path = GetOrDownloadModel(model).FullName;
+            var factory = WhisperFactory.FromPath(path);
+            Cache[model] = factory;
+            return factory;
         }
     }
 
@@ -47,8 +59,7 @@ public static class Transcriber
     /// </summary>
     public static FileInfo GetOrDownloadModel(string name)
     {
-        var valid = new[] { "tiny", "tiny.en", "base", "base.en", "small", "small.en", "medium", "medium.en", "large-v3", "large-v3-turbo", "large-v2", "large-v1", "large" };
-        var modelName = valid.Contains(name, StringComparer.OrdinalIgnoreCase) ? name : "small";
+        var modelName = IsValidModel(name) ? name : "small";
         var dir = Directory.CreateDirectory(AppPaths.ModelsDir);
         var file = Path.Combine(dir.FullName, $"ggml-{modelName}.bin");
         if (File.Exists(file) && new FileInfo(file).Length > 0)
@@ -107,10 +118,11 @@ public static class Transcriber
     /// Devolve segmentos com palavras reconstruídas dos tokens do whisper.cpp.
     /// </summary>
     public static List<ArgosSegment> Transcribe(
-        string wavPath, string? language, double duration, Action<double>? progressCb = null)
+        string wavPath, string? language, double duration,
+        Action<double>? progressCb = null, string? model = null)
     {
-        var model = GetModel();
-        var builder = model.CreateBuilder()
+        var factory = GetModel(model);
+        var builder = factory.CreateBuilder()
             .WithLanguage(string.IsNullOrWhiteSpace(language) ? "auto" : language!)
             .WithTokenTimestamps()
             .WithBeamSearchSamplingStrategy(b => b.WithBeamSize(2));

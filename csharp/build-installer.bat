@@ -30,6 +30,19 @@ copy /y "%SRC_ffprobe%" "dist\tools\ffprobe.exe" >nul
 :ffmpeg_ok
 
 echo.
+echo [2b/3] Conferindo o WebView2 (janela nativa) em installer\redist...
+set "WV2=installer\redist\MicrosoftEdgeWebview2Setup.exe"
+if exist "%WV2%" goto :wv2_ok
+if not exist "installer\redist" mkdir "installer\redist"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { Invoke-WebRequest -UseBasicParsing 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile '%WV2%' -TimeoutSec 120 } catch { }"
+if exist "%WV2%" (
+  echo      bootstrapper do WebView2 obtido.
+) else (
+  echo      [aviso] nao foi possivel baixar; o instalador sai sem instalar o WebView2 automaticamente.
+)
+:wv2_ok
+
+echo.
 echo [3/3] Compilando o instalador (Inno Setup)...
 REM nao empacotar dados de execucao que o app cria ao lado do exe
 if exist "dist\jobs" rd /s /q "dist\jobs"
@@ -52,6 +65,6 @@ if errorlevel 1 (
 )
 
 echo.
-echo Pronto! Instalador em: installer\out\ArgosClip-Setup-1.2.2.exe
+echo Pronto! Instalador em: installer\out\ArgosClip-Setup-1.2.3.exe
 endlocal
 exit /b 0

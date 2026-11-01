@@ -26,6 +26,7 @@ New-Item -ItemType Directory -Force -Path $jobs | Out-Null
 
 # --- sobe o servidor ---------------------------------------------------------
 $env:ARGOS_PORT = "$Port"
+$env:ARGOS_HEADLESS = "1"
 $env:ARGOS_JOBS_DIR = $jobs
 if (-not $env:ARGOS_WHISPER_MODEL) { $env:ARGOS_WHISPER_MODEL = "tiny" }
 

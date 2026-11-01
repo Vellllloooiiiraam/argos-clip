@@ -5,7 +5,7 @@
 ; ===========================================================================
 
 #define AppName        "Argos Clip"
-#define AppVersion     "1.2.2"
+#define AppVersion     "1.2.3"
 #define AppPublisher   "Argos Clip"
 #define AppExeName     "argos-clip.exe"
 #define DistDir        "..\dist"
@@ -44,6 +44,10 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ; Todo o conteudo publicado (exe, dlls, runtimes, wwwroot, tools\ffmpeg...)
 ; NUNCA empacotar dados de execucao (jobs\, models\) que o app cria ao lado do exe.
 Source: "{#DistDir}\*"; DestDir: "{app}"; Excludes: "jobs\*,models\*,*.pdb"; Flags: recursesubdirs createallsubdirs ignoreversion
+#if FileExists(AddBackslash(SourcePath) + "redist\MicrosoftEdgeWebview2Setup.exe")
+; Bootstrapper do WebView2 (Evergreen): instalado SO se a runtime estiver faltando.
+Source: "redist\MicrosoftEdgeWebview2Setup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall dontcopy
+#endif
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
@@ -52,8 +56,30 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: deskto
 
 [Run]
 Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
+#if FileExists(AddBackslash(SourcePath) + "redist\MicrosoftEdgeWebview2Setup.exe")
+Filename: "{tmp}\MicrosoftEdgeWebview2Setup.exe"; Parameters: "/silent /install"; StatusMsg: "Instalando o WebView2 (so na primeira vez)..."; Flags: waituntilterminated; Check: NeedsWebView2
+#endif
 
 [UninstallDelete]
 ; limpa dados gerados pelo app (jobs/modelos) ao desinstalar
 Type: filesandordirs; Name: "{app}\jobs"
 Type: filesandordirs; Name: "{app}\models"
+
+[Code]
+{ A janela nativa usa o Edge WebView2. Ele ja vem no Windows 11 e no Windows 10
+  atualizado; em maquinas antigas, instalamos a runtime pelo bootstrapper. }
+function NeedsWebView2: Boolean;
+var
+  V: String;
+begin
+  Result := True;
+  if RegQueryStringValue(HKLM32,
+       'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', V)
+     and (V <> '') and (V <> '0.0.0.0') then Result := False
+  else if RegQueryStringValue(HKLM,
+       'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', V)
+     and (V <> '') and (V <> '0.0.0.0') then Result := False
+  else if RegQueryStringValue(HKCU,
+       'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', V)
+     and (V <> '') and (V <> '0.0.0.0') then Result := False;
+end;

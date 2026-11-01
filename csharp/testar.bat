@@ -15,6 +15,7 @@ if not defined DOTNET (
 
 set "TESTDIR=%TEMP%\argos-clip-test"
 set "ARGOS_PORT=8599"
+set "ARGOS_HEADLESS=1"
 set "ARGOS_WHISPER_MODEL=tiny"
 set "ARGOS_JOBS_DIR=%TESTDIR%\jobs"
 

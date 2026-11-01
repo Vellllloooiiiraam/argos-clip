@@ -16,7 +16,7 @@ An **AI clip maker that runs 100% locally and for free** on your machine: it tur
 
 This repository has **two implementations** of the same app (same pipeline, same UI):
 
-- **C# / .NET 8** ([`csharp/`](csharp/)) — the **active, maintained line**. Native Windows app with its own executable and **installer**. All new versions ship from here. See [csharp/README.md](csharp/README.md).
+- **C# / .NET 8** ([`csharp/`](csharp/)) — the **active, maintained line**. Native Windows app that **opens in its own window (WebView2)**, with its own executable and **installer**. All new versions ship from here. See [csharp/README.md](csharp/README.md).
 - **Python** (repository root) — the **legacy client** (frozen). It was the original version, built on `faster-whisper`; it no longer receives new features or fixes.
 
 Both listen on `http://127.0.0.1:8484`. Check the **[Releases](../../releases)** tab to download the exe/installer. The change history lives in the [CHANGELOG](CHANGELOG.md).

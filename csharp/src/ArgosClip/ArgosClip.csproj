@@ -2,17 +2,30 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- WinExe: abre como app de janela (sem console preto). -->
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>ArgosClip</RootNamespace>
     <AssemblyName>argos-clip</AssemblyName>
-    <Version>1.2.2</Version>
+    <Version>1.2.3</Version>
     <InvariantGlobalization>false</InvariantGlobalization>
     <PlatformTarget>x64</PlatformTarget>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- WinForms adicionaria System.Drawing/System.Windows.Forms como usings globais,
+         o que conflita com OpenCvSharp (Size, Point...). Mantemos fora. -->
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Janela nativa: hospeda a interface web (Edge WebView2). -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2792.45" />
+
     <!-- Whisper local (whisper.cpp). Runtime = inferência em CPU. -->
     <PackageReference Include="Whisper.net" Version="1.9.1" />
     <PackageReference Include="Whisper.net.Runtime" Version="1.9.1" />

@@ -10,8 +10,9 @@ frozen).
 It takes **1 long video** and produces **N vertical 9:16 clips** with **burned-in
 karaoke captions** — all **100% local** (Whisper + FFmpeg), nothing sent to the cloud.
 
-> This version is a single app (local server + web UI). It starts on
-> `http://127.0.0.1:8484` and opens the browser by itself.
+> This version is a single app (local server + web UI) that opens in its **own
+> window** (Edge WebView2), like a regular application. The server starts on
+> `http://127.0.0.1:8484` only for the app's internal use.
 
 The change history lives in the [CHANGELOG](../CHANGELOG.md).
 
@@ -24,6 +25,7 @@ The change history lives in the [CHANGELOG](../CHANGELOG.md).
 | **Windows 10/11 (x64)** | running | — |
 | **FFmpeg + FFprobe** | running | must be on the `PATH` **or** in `src\ArgosClip\tools\` |
 | **.NET SDK 8** | **building** only (`build.bat`) | https://dotnet.microsoft.com/download |
+| **WebView2 Runtime** | running | already present on Windows 11 and updated Windows 10; otherwise: https://go.microsoft.com/fwlink/p/?LinkId=2124703 |
 | .NET Runtime | — | **not** needed: `build.bat` produces a self-contained `.exe` |
 
 **Whisper** runs embedded (`Whisper.net` / whisper.cpp), on CPU. The GGML model is
@@ -47,7 +49,7 @@ Produces `dist\argos-clip.exe` (self-contained — no .NET install required).
 iniciar.bat
 ```
 
-Opens the app and the browser at `http://127.0.0.1:8484`. Close the window (or `Ctrl+C`) to quit.
+Opens the app window. Close the window to quit.
 
 > Without `dist\argos-clip.exe`, `iniciar.bat` falls back to dev mode (`dotnet run`).
 
@@ -200,11 +202,12 @@ winget install JRSoftware.InnoSetup   :: once
 build-installer.bat
 ```
 
-Produces `installer\out\ArgosClip-Setup-1.2.1.exe` (~194 MB). The installer:
+Produces `installer\out\ArgosClip-Setup-1.2.3.exe` (~194 MB). The installer:
 
 - installs **per user** (no admin prompt) into `%LocalAppData%\Programs\Argos Clip`;
 - creates Start Menu (and optional Desktop) shortcuts;
 - bundles **FFmpeg** inside `tools\` (doesn't depend on the other person's PC);
+- installs the **WebView2** runtime if it's missing (native window);
 - includes an uninstaller; the app is self-contained (no .NET install required).
 
 > The first run still downloads the Whisper model (~466 MB with `small`).
@@ -228,7 +231,8 @@ argos-clip-csharp\
 │  ├─ make-test-video.ps1      # generates a spoken test video
 │  └─ run-smoke-test.ps1       # end-to-end test
 └─ src\ArgosClip\
-   ├─ Program.cs               # Kestrel + headers + cleanup + open browser
+   ├─ Program.cs               # Kestrel + headers + cleanup + window (WebView2)
+   ├─ MainWindow.cs            # native window (WebView2) hosting the UI
    ├─ Endpoints.cs             # /api/upload, /api/link, /api/status, /media
    ├─ Jobs.cs                  # job state + queue
    ├─ ArgosPipeline.cs         # orchestrates the pipeline
@@ -249,7 +253,7 @@ argos-clip-csharp\
 - **"ffmpeg not found"** → install FFmpeg and put it on the `PATH`, or copy
   `ffmpeg.exe`/`ffprobe.exe` into `src\ArgosClip\tools\` (and `dist\tools\` after building).
 - **Port busy** → the app handles it: if 8484 is in use it picks the next free
-  port and opens the browser there. To force a specific port:
+  port and opens the app there. To force a specific port:
   `set ARGOS_PORT=8600` before `iniciar.bat`.
 - **First run is slow** → it's downloading the Whisper model (a few hundred MB).
 - **Captions missing / no speech** → check that the video has an audio track and

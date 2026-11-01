@@ -10,6 +10,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 **English** · [Português](CHANGELOG.pt-BR.md)
 
+## [1.2.3] — 2026-11-01
+
+### Added
+- **Native app window.** The UI now opens in its **own window** (Edge WebView2)
+  instead of a browser tab — no address bar, dark title bar, and it remembers its
+  size and position.
+- Native **"Save clip"** dialog (choose where to save, like any desktop app).
+- `ARGOS_HEADLESS=1` runs the server without a window (used by the end-to-end
+  smoke test).
+- The installer now installs the **WebView2 runtime** automatically when it's missing.
+
+### Changed
+- The app is now a **windowed executable** (no console window).
+- External links open in the default browser; navigation is locked to the local UI.
+- Startup errors are written to `%APPDATA%\ArgosClip\logs\argos.log` and shown in a
+  dialog (there's no console anymore).
+
 ## [1.2.2] — 2026-11-01
 
 ### Added
@@ -84,6 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   sentence-aware selection, 9:16 face reframe, burned-in karaoke captions, optional
   B-roll), with a local web UI.
 
+[1.2.3]: ../../releases/tag/v1.2.3
 [1.2.2]: ../../releases/tag/v1.2.2
 [1.2.1]: ../../releases/tag/v1.2.1
 [1.2.0]: ../../releases/tag/v1.2

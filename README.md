@@ -16,7 +16,7 @@ Ferramenta de clipes com IA que roda **100% local e gratuita** na sua máquina: 
 
 Este repositório tem **duas implementações** do mesmo app (mesmo pipeline e mesma interface):
 
-- **C# / .NET 8** ([`csharp/`](csharp/)) — **linha ativa e mantida**. App nativo para Windows, com executável e **instalador** próprios. Todas as versões novas saem por aqui. Detalhes em [csharp/README.md](csharp/README.md).
+- **C# / .NET 8** ([`csharp/`](csharp/)) — **linha ativa e mantida**. App nativo para Windows que **abre em janela própria (WebView2)**, com executável e **instalador** próprios. Todas as versões novas saem por aqui. Detalhes em [csharp/README.md](csharp/README.md).
 - **Python** (raiz do repositório) — **cliente legado** (congelado). Era a versão original, com `faster-whisper`; não recebe mais features nem correções novas.
 
 Ambas sobem em `http://127.0.0.1:8484`. Veja a aba **[Releases](../../releases)** para baixar o exe/instalador. O histórico de mudanças está no [CHANGELOG](CHANGELOG.pt-BR.md).

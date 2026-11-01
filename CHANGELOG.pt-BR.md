@@ -10,6 +10,22 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
 
 [English](CHANGELOG.md) · **Português**
 
+## [1.2.3] — 2026-11-01
+
+### Adicionado
+- **Janela nativa do app.** A interface agora abre na **própria janela** (Edge
+  WebView2) em vez de uma aba do navegador — sem barra de endereço, barra de título
+  escura, e lembra tamanho e posição.
+- Diálogo nativo de **“Salvar clipe”** (escolher onde salvar, como em qualquer app).
+- `ARGOS_HEADLESS=1` roda só o servidor, sem janela (usado pelo teste de ponta a ponta).
+- O instalador agora instala a runtime do **WebView2** automaticamente quando falta.
+
+### Alterado
+- O app passou a ser um **executável de janela** (sem janela de console).
+- Links externos abrem no navegador padrão; a navegação fica travada na interface local.
+- Erros de startup vão para `%APPDATA%\ArgosClip\logs\argos.log` e aparecem numa caixa
+  de diálogo (não existe mais console).
+
 ## [1.2.2] — 2026-11-01
 
 ### Adicionado
@@ -84,6 +100,7 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
   Whisper, seleção ciente de frases, reframe 9:16 por rosto, legenda karaoke queimada,
   B-roll opcional), com interface web local.
 
+[1.2.3]: ../../releases/tag/v1.2.3
 [1.2.2]: ../../releases/tag/v1.2.2
 [1.2.1]: ../../releases/tag/v1.2.1
 [1.2.0]: ../../releases/tag/v1.2

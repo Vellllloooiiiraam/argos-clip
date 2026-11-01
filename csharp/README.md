@@ -8,8 +8,9 @@ Esta é a **linha ativa e mantida** do projeto — todas as versões novas saem 
 Pega **1 vídeo longo** e gera **N clipes verticais 9:16** com **legenda karaoke
 queimada** — tudo **100% local** (Whisper + FFmpeg), sem enviar nada para a nuvem.
 
-> Esta versão é um app único (servidor local + interface web). Ele sobe em
-> `http://127.0.0.1:8484` e abre o navegador sozinho.
+> Esta versão é um app único (servidor local + interface web) que abre numa
+> **janela própria** (Edge WebView2), como um aplicativo comum. O servidor sobe em
+> `http://127.0.0.1:8484` só para uso interno do app.
 
 O histórico de mudanças está no [CHANGELOG](../CHANGELOG.pt-BR.md).
 
@@ -22,6 +23,7 @@ O histórico de mudanças está no [CHANGELOG](../CHANGELOG.pt-BR.md).
 | **Windows 10/11 (x64)** | rodar | — |
 | **FFmpeg + FFprobe** | rodar | precisam estar no `PATH` **ou** em `src\ArgosClip\tools\` |
 | **.NET SDK 8** | apenas para **compilar** (`build.bat`) | https://dotnet.microsoft.com/download |
+| **WebView2 Runtime** | rodar | já vem no Windows 11 e no Windows 10 atualizado; senão: https://go.microsoft.com/fwlink/p/?LinkId=2124703 |
 | .NET Runtime | — | **não** é preciso: o `build.bat` gera um `.exe` self-contained |
 
 O **Whisper** roda embutido (`Whisper.net` / whisper.cpp), em CPU. O modelo
@@ -45,7 +47,7 @@ Gera `dist\argos-clip.exe` (self-contained — não precisa de .NET instalado).
 iniciar.bat
 ```
 
-Abre o app e o navegador em `http://127.0.0.1:8484`. Feche a janela (ou `Ctrl+C`) para sair.
+Abre a janela do app. Feche a janela para sair.
 
 > Sem o `dist\argos-clip.exe`, o `iniciar.bat` cai no modo dev (`dotnet run`).
 
@@ -198,11 +200,12 @@ winget install JRSoftware.InnoSetup   :: uma vez só
 build-installer.bat
 ```
 
-Gera `installer\out\ArgosClip-Setup-1.2.1.exe` (~194 MB). O instalador:
+Gera `installer\out\ArgosClip-Setup-1.2.3.exe` (~194 MB). O instalador:
 
 - instala **por usuário** (não pede admin) em `%LocalAppData%\Programs\Argos Clip`;
 - cria atalhos no Menu Iniciar (e Desktop, opcional);
 - inclui o **FFmpeg** dentro de `tools\` (não depende do PC da outra pessoa);
+- instala a runtime do **WebView2** se ela faltar (janela nativa);
 - traz desinstalador; o app é self-contained (não exige .NET instalado).
 
 > A primeira execução ainda baixa o modelo do Whisper (~466 MB com `small`).
@@ -226,7 +229,8 @@ argos-clip-csharp\
 │  ├─ make-test-video.ps1      # gera vídeo de teste com fala
 │  └─ run-smoke-test.ps1       # teste de ponta a ponta
 └─ src\ArgosClip\
-   ├─ Program.cs               # Kestrel + cabeçalhos + limpeza + abrir navegador
+   ├─ Program.cs               # Kestrel + cabeçalhos + limpeza + janela (WebView2)
+   ├─ MainWindow.cs            # janela nativa (WebView2) que hospeda a interface
    ├─ Endpoints.cs             # /api/upload, /api/link, /api/status, /media
    ├─ Jobs.cs                  # estado + fila de jobs
    ├─ ArgosPipeline.cs         # orquestra o pipeline

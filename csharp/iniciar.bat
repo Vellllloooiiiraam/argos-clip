@@ -1,6 +1,6 @@
 @echo off
 REM ===========================================================================
-REM  Argos Clip (C#) - abre o app no navegador (http://127.0.0.1:8484).
+REM  Argos Clip (C#) - abre o app (janela nativa).
 REM  Se dist\argos-clip.exe existir, usa ele; senao roda em modo dev (dotnet run).
 REM ===========================================================================
 setlocal
@@ -11,8 +11,8 @@ echo  ==============================================
 echo   Argos Clip - 1 video longo -^> N clipes virais
 echo  ==============================================
 echo.
-echo  O navegador vai abrir sozinho em http://127.0.0.1:8484
-echo  Feche esta janela (ou Ctrl+C) para encerrar o app.
+echo  A janela do app vai abrir sozinha.
+echo  Feche a janela do app para encerrar.
 echo.
 
 if exist "dist\argos-clip.exe" (

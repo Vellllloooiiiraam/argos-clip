@@ -2,6 +2,8 @@
 bin/
 obj/
 installer/out/
+# bootstrapper do WebView2 (baixado pelo build-installer.bat)
+installer/redist/
 
 # dados de execução
 jobs/

@@ -47,11 +47,16 @@ var port = int.TryParse(Environment.GetEnvironmentVariable("ARGOS_PORT"), out va
     ? p
     : NextFreePort(DefaultPort);
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    // Fixa o content root na pasta do executável: sem isso, iniciar o app com
+    // outro diretório atual (ex.: duplo-clique fora da pasta) quebra o startup.
+    ContentRootPath = AppPaths.ExeDir,
+    WebRootPath = Path.Combine(AppPaths.ExeDir, "wwwroot"),
+});
 
 builder.WebHost.UseUrls($"http://{Host}:{port}");
-builder.WebHost.UseContentRoot(AppPaths.ExeDir);
-builder.WebHost.UseWebRoot(Path.Combine(AppPaths.ExeDir, "wwwroot"));
 builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = MaxBody);
 builder.Services.Configure<FormOptions>(o =>
 {

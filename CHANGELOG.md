@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - When the app is configured through the UI, unrelated API keys present in the
   environment are ignored (prevents using one provider's key on another).
 
+### Upgrading from 1.2.1
+- Install `ArgosClip-Setup-1.2.2.exe` **over** the previous version (per-user, no
+  admin; your `jobs\` and `models\` are kept).
+- To enable AI you no longer need the terminal: use the in-app **"⚙️ Configure AI"**
+  button. Existing environment variables keep working and take precedence over
+  the saved config.
+
 ## [1.2.1] — 2026-11-01
 
 ### Added

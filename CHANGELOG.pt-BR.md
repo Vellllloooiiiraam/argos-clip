@@ -27,6 +27,13 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
 - Quando a IA é configurada pela interface, chaves soltas de outros serviços no
   ambiente são ignoradas (evita usar a chave de um provedor em outro).
 
+### Atualizando de 1.2.1
+- Instale o `ArgosClip-Setup-1.2.2.exe` **por cima** da versão anterior (por
+  usuário, sem admin; seus `jobs\` e `models\` são preservados).
+- Para ligar a IA não precisa mais do terminal: use o botão **“⚙️ Configurar IA”**
+  no app. As variáveis de ambiente continuam valendo e têm prioridade sobre a
+  config salva.
+
 ## [1.2.1] — 2026-11-01
 
 ### Adicionado

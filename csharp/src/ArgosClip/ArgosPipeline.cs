@@ -66,7 +66,7 @@ public sealed class ArgosPipeline
             var sentences = Scoring.SplitSentences(segments, opt.MaxLen);
             var chunks = Scoring.GroupSentences(sentences, opt.MinLen, opt.MaxLen);
 
-            // C: seleção por IA (Gemini) quando habilitada; senão heurística pura.
+            // C: seleção por IA quando habilitada; senão heurística pura.
             List<Clip> chosen;
             string selectionMode;
             var llmPicks = opt.UseLlm
@@ -75,7 +75,7 @@ public sealed class ArgosPipeline
             if (llmPicks is { Count: > 0 })
             {
                 chosen = llmPicks;
-                selectionMode = "IA (Gemini)";
+                selectionMode = $"IA ({LlmSelector.Provider})";
             }
             else
             {

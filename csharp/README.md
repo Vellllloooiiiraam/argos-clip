@@ -72,12 +72,12 @@ segmentos do Whisper viram frases e cada clipe agrupa frases inteiras dentro de
 | **Clipes** | 5 | quantos clipes gerar (1–10) |
 | **Modelo** | `small` | modelo do Whisper — `tiny`/`base` são rápidos; `medium`/`large-v3-turbo` são mais precisos (e mais lentos) |
 | **Duração (s)** | 20 até 60 | faixa de duração de cada clipe |
-| **Seleção por IA** | desligada | usa o **Gemini** para escolher os melhores momentos (precisa de chave — ver abaixo) |
+| **Seleção por IA** | desligada | usa a IA (Gemini, Groq, OpenAI, Ollama...) para escolher os melhores momentos (precisa de chave/provedor — ver abaixo) |
 
-Sem chave de IA, a seleção é a **heurística local** (ganchos, números,
-perguntas, abertura forte, densidade de fala). Com a chave, o Gemini lê a
-transcrição, escolhe os trechos e a heurística ainda entra como segunda opinião
-para completar as vagas — **se a IA falhar, o job continua na heurística**.
+Sem IA configurada, a seleção é a **heurística local** (ganchos, números,
+perguntas, abertura forte, densidade de fala). Com um provedor configurado, a IA
+lê a transcrição, escolhe os trechos e a heurística ainda entra como segunda
+opinião para completar as vagas — **se a IA falhar, o job continua na heurística**.
 
 ---
 
@@ -88,7 +88,7 @@ upload/link ──► ffprobe (duração/áudio)
              ──► ffmpeg extrai áudio 16 kHz mono WAV
              ──► Whisper (local) transcreve COM timestamps por palavra
              ──► frases: corta em pontuação final/pausa (nunca no meio)
-             ──► seleção: IA (Gemini, opcional) OU heurística
+             ──► seleção: IA (opcional) OU heurística
                  agrupa frases inteiras em [mín, máx] e escolhe os N melhores
              ──► B-roll opcional (Pexels/Pixabay) — só se houver chave
              ──► Reframe 9:16: rastreia o rosto (OpenCV) e corta seguindo
@@ -118,8 +118,10 @@ Rotas e variáveis de ambiente são as mesmas do original.
 | `ARGOS_WHISPER_MODEL` | `small` | `tiny` \| `base` \| `small` \| `medium` \| `large-v3-turbo` |
 | `ARGOS_MIN_CLIP_S` | `20` | duração mínima de cada clipe (s) |
 | `ARGOS_MAX_CLIP_S` | `60` | duração máxima de cada clipe (s) |
-| `ARGOS_LLM_KEY` | — | chave do Google Gemini; **liga a seleção por IA**. Também aceita `ARGOS_GEMINI_KEY`, `GEMINI_API_KEY` ou `GOOGLE_API_KEY` |
-| `ARGOS_LLM_MODEL` | `gemini-2.0-flash` | modelo do Gemini usado na seleção |
+| `ARGOS_LLM_KEY` | — | chave da IA; **liga a seleção por IA**. No Gemini, também aceita `ARGOS_GEMINI_KEY`, `GEMINI_API_KEY` ou `GOOGLE_API_KEY` |
+| `ARGOS_LLM_PROVIDER` | `gemini` | provedor da IA: `gemini`, `groq`, `openai`, `openrouter` ou `ollama` |
+| `ARGOS_LLM_MODEL` | conforme o provedor | modelo usado na seleção (ex.: `gemini-flash-lite-latest`, `llama-3.3-70b-versatile`) |
+| `ARGOS_LLM_BASE_URL` | conforme o provedor | endpoint compatível com OpenAI (ex.: `http://127.0.0.1:11434/v1` para Ollama) |
 | `ARGOS_PORT` | `8484` | porta do app. **Sem ela, o app usa a 8484 e, se estiver ocupada, escolhe a próxima livre sozinho** |
 | `ARGOS_MAX_ACTIVE_JOBS` | `2` | jobs processando ao mesmo tempo |
 | `ARGOS_JOB_TTL_HOURS` | `24` | horas até apagar jobs concluídos |
@@ -146,6 +148,27 @@ iniciar.bat
 > A chave grátis do Gemini sai em https://aistudio.google.com/apikey. Com ela
 > setada, a caixa **“Seleção por IA”** já vem marcada na interface.
 
+Exemplo: usar a **Groq** (plano grátis) ou qualquer endpoint compatível com OpenAI
+
+```bat
+set ARGOS_LLM_PROVIDER=groq
+set ARGOS_LLM_KEY=sua_chave_da_groq
+iniciar.bat
+```
+
+Exemplo: rodar **100% local** com o Ollama (sem chave e sem nuvem)
+
+```bat
+set ARGOS_LLM_PROVIDER=ollama
+set ARGOS_LLM_BASE_URL=http://127.0.0.1:11434/v1
+set ARGOS_LLM_MODEL=llama3.1
+iniciar.bat
+```
+
+> A seleção por IA é sempre **opcional**. Se a chave faltar, estourar a cota
+> (HTTP 402) ou o provedor estiver fora do ar, o job continua pela **heurística
+> local** — nunca falha por causa da IA.
+
 ---
 
 ## Gerar o instalador (para distribuir)
@@ -155,7 +178,7 @@ winget install JRSoftware.InnoSetup   :: uma vez só
 build-installer.bat
 ```
 
-Gera `installer\out\ArgosClip-Setup-1.2.0.exe` (~194 MB). O instalador:
+Gera `installer\out\ArgosClip-Setup-1.2.1.exe` (~194 MB). O instalador:
 
 - instala **por usuário** (não pede admin) em `%LocalAppData%\Programs\Argos Clip`;
 - cria atalhos no Menu Iniciar (e Desktop, opcional);

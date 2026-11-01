@@ -178,7 +178,7 @@ fetch('/api/config').then(r => r.ok ? r.json() : null).then(cfg => {
   const box = document.getElementById('usellm');
   if (cfg.llm_available) {
     box.checked = true;
-    document.getElementById('llmhint').textContent = '(Gemini)';
+    document.getElementById('llmhint').textContent = '(' + (cfg.llm_provider || 'IA') + ')';
   } else {
     box.disabled = true;
     document.getElementById('llmhint').textContent = '(configure ARGOS_LLM_KEY)';

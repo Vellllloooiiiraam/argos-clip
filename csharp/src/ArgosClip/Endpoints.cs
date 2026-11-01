@@ -20,6 +20,7 @@ public static class Endpoints
         app.MapGet("/api/config", () => Results.Json(new Dictionary<string, object?>
         {
             ["llm_available"] = LlmSelector.Available,
+            ["llm_provider"] = LlmSelector.Available ? LlmSelector.Provider : null,
             ["llm_model"] = LlmSelector.Available ? LlmSelector.Model : null,
             ["whisper_model"] = Transcriber.DefaultModelName,
             ["whisper_models"] = new[] { "tiny", "base", "small", "medium", "large-v3-turbo" },

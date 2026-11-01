@@ -11,6 +11,12 @@ const string Host = "127.0.0.1";
 const int DefaultPort = 8484;
 const long MaxBody = 8L * 1024 * 1024 * 1024; // 8 GB
 
+// A seleção por IA faz sync-over-async (GetResult). Com o ThreadPool no mínimo
+// padrão isso pode travar a 1ª chamada HTTP (starvation). Subir o mínimo evita.
+ThreadPool.SetMinThreads(
+    Math.Max(Environment.ProcessorCount * 4, 32),
+    Math.Max(Environment.ProcessorCount * 4, 32));
+
 // Porta: ARGOS_PORT manda; sem ela, usa 8484 e, se estiver ocupada, acha a
 // próxima livre sozinho (nada de brigar com outro app).
 static bool IsPortFree(int p)

@@ -20,7 +20,7 @@ public sealed record ClipOptions
     /// <summary>Modelo do Whisper (tiny/base/small/medium/large-v3-turbo...).</summary>
     public string Model { get; init; } = "small";
 
-    /// <summary>Usar seleção por IA (Gemini) quando houver chave configurada.</summary>
+    /// <summary>Usar seleção por IA quando houver chave/provedor configurado.</summary>
     public bool UseLlm { get; init; }
 
     /// <summary>Padrões a partir do ambiente (usado quando a UI não manda nada).</summary>

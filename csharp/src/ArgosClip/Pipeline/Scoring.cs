@@ -254,7 +254,12 @@ public static class Scoring
                 Math.Max(0.0, c.Start - leadIn),
                 c.End + leadOut,
                 c.Text,
-                c.Words);
+                c.Words)
+            {
+                Score = c.Score,
+                Reasons = c.Reasons,
+                BrollUsed = c.BrollUsed,
+            };
         }
     }
 

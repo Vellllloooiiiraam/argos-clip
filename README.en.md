@@ -6,7 +6,7 @@ An **AI clip maker that runs 100% locally and for free** on your machine: it tur
 
 - **Input:** upload a video **or paste a link** (YouTube, Twitch, Vimeo, X, Reddit, TikTok... via yt-dlp)
 - **Transcription:** Whisper via `faster-whisper` (CPU, int8, `small` model)
-- **Moment selection:** cuts **on sentence boundaries** + scoring heuristic (hooks, numbers, questions, speech density) and, **optionally**, AI selection via `ARGOS_LLM_KEY`
+- **Moment selection:** cuts **on sentence boundaries** + scoring heuristic (hooks, numbers, questions, speech density) and, **optionally**, AI selection via the in-app **"⚙️ Configure AI"** button (Gemini, Groq, OpenAI, OpenRouter or local Ollama)
 - **Face reframe:** OpenCV tracks the speaker and the 9:16 crop follows the face (fallback: center crop)
 - **Automatic B-Roll (optional):** fetches stock footage from Pexels/Pixabay and overlays it mid-clip
 - **Clips:** FFmpeg crops to 9:16 (1080×1920) and burns karaoke-style captions

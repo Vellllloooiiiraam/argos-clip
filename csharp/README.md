@@ -144,6 +144,20 @@ set ARGOS_WHISPER_MODEL=base
 iniciar.bat
 ```
 
+### Ligar a IA pela interface (recomendado)
+
+Na tela inicial, clique em **⚙️ Configurar IA (grátis)**, escolha o provedor
+(`Gemini`, `Groq`, `OpenAI`, `OpenRouter` ou `Ollama` local), cole a chave e
+clique em **Salvar e testar**. A chave fica salva **criptografada** (DPAPI, por
+usuário do Windows) em `%APPDATA%\ArgosClip\settings.json` — sem abrir terminal.
+
+> Chave grátis do Gemini: https://aistudio.google.com/apikey · da Groq:
+> https://console.groq.com/keys. O **Ollama** roda local e não precisa de chave.
+
+### Ligar a IA por variáveis de ambiente (avançado)
+
+As variáveis abaixo também funcionam e têm **prioridade** sobre a config salva.
+
 Exemplo: ligar a seleção por IA (Gemini)
 
 ```bat

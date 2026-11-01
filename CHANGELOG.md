@@ -10,6 +10,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 **English** · [Português](CHANGELOG.pt-BR.md)
 
+## [1.2.2] — 2026-11-01
+
+### Added
+- **In-app AI setup.** A **"⚙️ Configure AI (free)"** button opens a panel to pick
+  a provider (Gemini, Groq, OpenAI, OpenRouter or local Ollama), paste the API key
+  and test it — no terminal, no environment variables.
+- **"Save and test"** calls the provider and tells you whether the key works
+  (invalid key, exhausted quota, wrong model/URL, etc.).
+
+### Changed
+- The API key is stored **encrypted with Windows DPAPI** (per Windows user) in
+  `%APPDATA%\ArgosClip\settings.json` and is never sent back to the UI.
+- Environment variables still work as an **advanced override**, but are no longer
+  needed to use AI.
+- When the app is configured through the UI, unrelated API keys present in the
+  environment are ignored (prevents using one provider's key on another).
+
 ## [1.2.1] — 2026-11-01
 
 ### Added
@@ -60,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   sentence-aware selection, 9:16 face reframe, burned-in karaoke captions, optional
   B-roll), with a local web UI.
 
+[1.2.2]: ../../releases/tag/v1.2.2
 [1.2.1]: ../../releases/tag/v1.2.1
 [1.2.0]: ../../releases/tag/v1.2
 [1.1.0]: ../../releases/tag/v1.1

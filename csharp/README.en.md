@@ -146,6 +146,20 @@ set ARGOS_WHISPER_MODEL=base
 iniciar.bat
 ```
 
+### Enable AI from the UI (recommended)
+
+On the home screen, click **⚙️ Configure AI (free)**, pick a provider (`Gemini`,
+`Groq`, `OpenAI`, `OpenRouter` or local `Ollama`), paste the key and click
+**Save and test**. The key is stored **encrypted** (DPAPI, per Windows user) in
+`%APPDATA%\ArgosClip\settings.json` — no terminal needed.
+
+> Free keys: Gemini at https://aistudio.google.com/apikey · Groq at
+> https://console.groq.com/keys. **Ollama** runs locally and needs no key.
+
+### Enable AI via environment variables (advanced)
+
+The variables below also work and take **precedence** over the saved config.
+
 Example: enable AI selection (Gemini)
 
 ```bat

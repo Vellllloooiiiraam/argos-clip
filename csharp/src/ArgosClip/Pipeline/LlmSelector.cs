@@ -39,8 +39,13 @@ public static class LlmSelector
     }
 
     // ------------------------------------------------------------------
-    // Configuração (variáveis de ambiente)
+    // Configuração. Três fontes, nesta prioridade:
+    //   1) variáveis de ambiente (override avançado);
+    //   2) arquivo salvo pela interface (LlmConfigStore, chave via DPAPI);
+    //   3) padrões por provedor.
     // ------------------------------------------------------------------
+
+    private static LlmSettings Saved => LlmConfigStore.Current;
 
     /// <summary>Provedor: "gemini" (padrão) ou um endpoint compatível com OpenAI.</summary>
     public static string Provider
@@ -52,19 +57,46 @@ public static class LlmSelector
             var p = FirstEnv("ARGOS_LLM_PROVIDER")?.ToLowerInvariant();
             if (!string.IsNullOrEmpty(p)) return p;
             if (FirstEnv("ARGOS_LLM_BASE_URL") is not null) return "openai";
+            var saved = Saved.Provider?.ToLowerInvariant();
+            if (!string.IsNullOrEmpty(saved)) return saved;
             return "gemini";
         }
     }
 
     private static bool IsGemini => Provider is "gemini" or "google";
 
-    public static string? ApiKey => IsGemini
-        ? FirstEnv("ARGOS_LLM_KEY", "ARGOS_GEMINI_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY")
-        : FirstEnv("ARGOS_LLM_KEY", "GROQ_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY", "TOGETHER_API_KEY");
+    public static string? ApiKey
+    {
+        get
+        {
+            // 1) Override explícito por ambiente.
+            var explicitKey = FirstEnv("ARGOS_LLM_KEY");
+            if (explicitKey is { Length: > 0 }) return explicitKey;
 
-    public static string Model => FirstEnv("ARGOS_LLM_MODEL") ?? DefaultModel;
+            // 2) Chave salva pela interface.
+            var saved = Saved;
+            if (saved.HasKey) return saved.ApiKey;
 
-    private static string DefaultModel => Provider switch
+            // 3) Se o usuário já configura pela interface, NÃO usamos chaves
+            //    soltas de outros serviços presentes no ambiente (evita usar a
+            //    chave de um provedor em outro). Elas só valem em setups antigos
+            //    baseados puramente em variáveis de ambiente.
+            if (LlmConfigStore.HasSavedConfig) return null;
+
+            return IsGemini
+                ? FirstEnv("ARGOS_GEMINI_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY")
+                : FirstEnv("GROQ_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY", "TOGETHER_API_KEY");
+        }
+    }
+
+    public static string Model =>
+        FirstEnv("ARGOS_LLM_MODEL")
+        ?? (string.IsNullOrWhiteSpace(Saved.Model) ? null : Saved.Model)
+        ?? DefaultModel;
+
+    private static string DefaultModel => DefaultModelFor(Provider);
+
+    private static string DefaultModelFor(string provider) => provider switch
     {
         "groq" => "llama-3.3-70b-versatile",
         "openrouter" => "meta-llama/llama-3.3-70b-instruct:free",
@@ -73,21 +105,148 @@ public static class LlmSelector
         _ => "gemini-flash-lite-latest",
     };
 
-    public static string BaseUrl =>
-        (FirstEnv("ARGOS_LLM_BASE_URL") ?? DefaultBaseUrl).TrimEnd('/');
+    public static string BaseUrl => (ResolveBaseUrl() ?? DefaultBaseUrl).TrimEnd('/');
 
-    private static string DefaultBaseUrl => Provider switch
+    private static string? ResolveBaseUrl() =>
+        FirstEnv("ARGOS_LLM_BASE_URL")
+        ?? (string.IsNullOrWhiteSpace(Saved.BaseUrl) ? null : Saved.BaseUrl);
+
+    private static string DefaultBaseUrl => DefaultBaseUrlFor(Provider);
+
+    private static string DefaultBaseUrlFor(string provider) => provider switch
     {
         "groq" => "https://api.groq.com/openai/v1",
         "openrouter" => "https://openrouter.ai/api/v1",
         "openai" => "https://api.openai.com/v1",
         "ollama" => "http://127.0.0.1:11434/v1",
-        _ => "https://api.groq.com/openai/v1",
+        // Gemini usa URL própria; base URL não se aplica.
+        _ => "",
     };
 
     // Ollama local não exige chave; os demais sim.
     public static bool Available =>
         Provider == "ollama" || ApiKey is { Length: > 0 };
+
+    // ------------------------------------------------------------------
+    // Catálogo de provedores (exposto à interface)
+    // ------------------------------------------------------------------
+
+    public sealed record LlmProviderInfo(
+        string Id, string Label, bool NeedsKey, string DefaultModel, string DefaultBase);
+
+    public static IReadOnlyList<LlmProviderInfo> Providers { get; } = new[]
+    {
+        new LlmProviderInfo("gemini", "Google Gemini", true,
+            "gemini-flash-lite-latest", ""),
+        new LlmProviderInfo("groq", "Groq", true,
+            "llama-3.3-70b-versatile", "https://api.groq.com/openai/v1"),
+        new LlmProviderInfo("openai", "OpenAI", true,
+            "gpt-4o-mini", "https://api.openai.com/v1"),
+        new LlmProviderInfo("openrouter", "OpenRouter", true,
+            "meta-llama/llama-3.3-70b-instruct:free", "https://openrouter.ai/api/v1"),
+        new LlmProviderInfo("ollama", "Ollama (local)", false,
+            "llama3.1", "http://127.0.0.1:11434/v1"),
+    };
+
+    /// <summary>Resumo da config para a interface. NUNCA devolve a chave.</summary>
+    public static Dictionary<string, object?> ConfigSnapshot() => new()
+    {
+        ["provider"] = Provider,
+        ["model"] = Model,
+        ["base_url"] = BaseUrl,
+        ["has_key"] = ApiKey is { Length: > 0 },
+        ["available"] = Available,
+        ["providers"] = Providers.Select(p => new Dictionary<string, object?>
+        {
+            ["id"] = p.Id,
+            ["label"] = p.Label,
+            ["needs_key"] = p.NeedsKey,
+            ["default_model"] = p.DefaultModel,
+            ["default_base"] = p.DefaultBase,
+        }).ToList(),
+    };
+
+    // ------------------------------------------------------------------
+    // Teste de chave (botão "Salvar e testar")
+    // ------------------------------------------------------------------
+
+    /// <summary>Faz uma chamada mínima ao provedor e diz se a chave responde.</summary>
+    public static (bool Ok, string Message) Test(
+        string? provider, string? apiKey, string? model, string? baseUrl)
+    {
+        provider = (provider ?? "").Trim().ToLowerInvariant();
+        if (provider.Length == 0) provider = "gemini";
+        var isGemini = provider is "gemini" or "google";
+        var needsKey = provider != "ollama";
+        if (needsKey && string.IsNullOrWhiteSpace(apiKey))
+        {
+            return (false, "Informe a chave da API.");
+        }
+
+        model = string.IsNullOrWhiteSpace(model) ? DefaultModelFor(provider) : model!.Trim();
+        baseUrl = string.IsNullOrWhiteSpace(baseUrl)
+            ? DefaultBaseUrlFor(provider).TrimEnd('/')
+            : baseUrl!.Trim().TrimEnd('/');
+
+        const int timeout = 25;
+        int code;
+        string json;
+        string? err;
+        if (isGemini)
+        {
+            var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent" +
+                      $"?key={Uri.EscapeDataString(apiKey!)}";
+            (code, json, err) = SendOnce(url, TestGeminiBody(), null, timeout);
+        }
+        else
+        {
+            var url = $"{baseUrl}/chat/completions";
+            (code, json, err) = SendOnce(url, TestOpenAiBody(model), apiKey, timeout);
+        }
+
+        if (err is not null) return (false, err);
+        if (code == 200)
+        {
+            var text = isGemini ? ExtractGeminiText(json) : ExtractOpenAiText(json);
+            return string.IsNullOrWhiteSpace(text)
+                ? (false, "O provedor respondeu 200, mas sem texto (confira modelo/URL).")
+                : (true, "Chave válida — " + provider + "/" + model);
+        }
+        return (false, DescribeError(code, json));
+    }
+
+    private static string TestGeminiBody() => new JsonObject
+    {
+        ["contents"] = new JsonArray
+        {
+            new JsonObject
+            {
+                ["role"] = "user",
+                ["parts"] = new JsonArray { new JsonObject { ["text"] = "Responda apenas: ok" } },
+            },
+        },
+        ["generationConfig"] = new JsonObject { ["maxOutputTokens"] = 8 },
+    }.ToJsonString();
+
+    private static string TestOpenAiBody(string model) => new JsonObject
+    {
+        ["model"] = model,
+        ["max_tokens"] = 8,
+        ["messages"] = new JsonArray
+        {
+            new JsonObject { ["role"] = "user", ["content"] = "Responda apenas: ok" },
+        },
+    }.ToJsonString();
+
+    private static string DescribeError(int code, string json) => code switch
+    {
+        401 or 403 => "Chave inválida ou sem permissão.",
+        402 => "Cota esgotada / faturamento indisponível para esta chave.",
+        404 => "Modelo ou URL não encontrado.",
+        400 => "Requisição inválida (confira modelo e URL): " + Truncate(json, 160),
+        429 => "Limite de requisições atingido; tente de novo em instantes.",
+        _ => $"HTTP {code}: {Truncate(json, 200)}",
+    };
 
     // ------------------------------------------------------------------
     // Entrada principal

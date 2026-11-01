@@ -10,6 +10,23 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
 
 [English](CHANGELOG.md) · **Português**
 
+## [1.2.2] — 2026-11-01
+
+### Adicionado
+- **Configuração da IA dentro do app.** O botão **“⚙️ Configurar IA (grátis)”** abre
+  um painel para escolher o provedor (Gemini, Groq, OpenAI, OpenRouter ou Ollama
+  local), colar a chave e testá-la — sem terminal e sem variáveis de ambiente.
+- **“Salvar e testar”** chama o provedor e diz se a chave funciona (chave inválida,
+  cota esgotada, modelo/URL errados etc.).
+
+### Alterado
+- A chave é guardada **criptografada com DPAPI do Windows** (por usuário) em
+  `%APPDATA%\ArgosClip\settings.json` e nunca é devolvida à interface.
+- As variáveis de ambiente continuam funcionando como **override avançado**, mas
+  deixam de ser necessárias para usar a IA.
+- Quando a IA é configurada pela interface, chaves soltas de outros serviços no
+  ambiente são ignoradas (evita usar a chave de um provedor em outro).
+
 ## [1.2.1] — 2026-11-01
 
 ### Adicionado
@@ -60,6 +77,7 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
   Whisper, seleção ciente de frases, reframe 9:16 por rosto, legenda karaoke queimada,
   B-roll opcional), com interface web local.
 
+[1.2.2]: ../../releases/tag/v1.2.2
 [1.2.1]: ../../releases/tag/v1.2.1
 [1.2.0]: ../../releases/tag/v1.2
 [1.1.0]: ../../releases/tag/v1.1

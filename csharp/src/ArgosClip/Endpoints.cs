@@ -29,6 +29,53 @@ public static class Endpoints
             ["default_clips"] = 5,
         }));
 
+        // ---- Configuração da IA pela interface (sem abrir terminal) --------
+        app.MapGet("/api/llm/config", () => Results.Json(LlmSelector.ConfigSnapshot()));
+
+        app.MapPost("/api/llm/config", async (HttpRequest request) =>
+        {
+            var (provider, model, baseUrl, apiKey, hasKey) = await ReadLlmConfig(request);
+            if (string.IsNullOrWhiteSpace(provider))
+            {
+                return Results.Json(
+                    new Dictionary<string, object?> { ["detail"] = "Escolha um provedor." },
+                    statusCode: 400);
+            }
+            provider = provider!.Trim().ToLowerInvariant();
+
+            var current = LlmConfigStore.Current;
+            var providerChanged =
+                !string.Equals(current.Provider, provider, StringComparison.OrdinalIgnoreCase);
+            // Sem chave no corpo: mantém a atual só se o provedor não mudou —
+            // evita reaproveitar a chave de um provedor em outro.
+            var key = hasKey ? apiKey : providerChanged ? null : current.ApiKey;
+
+            LlmConfigStore.Save(new LlmSettings
+            {
+                Provider = provider,
+                Model = string.IsNullOrWhiteSpace(model) ? null : model!.Trim(),
+                BaseUrl = string.IsNullOrWhiteSpace(baseUrl) ? null : baseUrl!.Trim(),
+                ApiKey = key,
+            });
+            return Results.Json(LlmSelector.ConfigSnapshot());
+        });
+
+        app.MapPost("/api/llm/test", async (HttpRequest request) =>
+        {
+            var (provider, model, baseUrl, apiKey, hasKey) = await ReadLlmConfig(request);
+            if (string.IsNullOrWhiteSpace(provider)) provider = LlmSelector.Provider;
+            if (string.IsNullOrWhiteSpace(model)) model = null;
+            if (!hasKey) apiKey = LlmConfigStore.Current.ApiKey;
+            var (ok, message) = LlmSelector.Test(provider, apiKey, model, baseUrl);
+            return Results.Json(new Dictionary<string, object?> { ["ok"] = ok, ["message"] = message });
+        });
+
+        app.MapDelete("/api/llm/config", () =>
+        {
+            LlmConfigStore.Clear();
+            return Results.Json(LlmSelector.ConfigSnapshot());
+        });
+
         app.MapPost("/api/upload", async (HttpRequest request) =>
         {
             IFormCollection form;
@@ -191,6 +238,33 @@ public static class Endpoints
             }
             return Results.File(path, ContentTypeFor(path), enableRangeProcessing: true);
         });
+    }
+
+    private static async Task<(string? Provider, string? Model, string? BaseUrl, string? ApiKey, bool HasKey)>
+        ReadLlmConfig(HttpRequest request)
+    {
+        string raw;
+        using (var reader = new StreamReader(request.Body, System.Text.Encoding.UTF8))
+        {
+            raw = await reader.ReadToEndAsync();
+        }
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(raw) ? "{}" : raw);
+            var root = doc.RootElement;
+            if (root.ValueKind != JsonValueKind.Object)
+            {
+                return (null, null, null, null, false);
+            }
+            var hasKey = root.TryGetProperty("api_key", out var k);
+            var apiKey = hasKey && k.ValueKind == JsonValueKind.String ? k.GetString()?.Trim() : null;
+            return (JsonField(root, "provider"), JsonField(root, "model"),
+                JsonField(root, "base_url"), apiKey, hasKey);
+        }
+        catch
+        {
+            return (null, null, null, null, false);
+        }
     }
 
     private static Dictionary<string, object?> NewState(string jobId, string status, string stage, string file) => new()

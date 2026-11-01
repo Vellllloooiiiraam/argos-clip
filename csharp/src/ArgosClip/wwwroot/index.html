@@ -94,6 +94,42 @@
   .dl:hover { filter: brightness(1.15); }
   .reset { display:block; margin: 24px auto 0; background:none; border:1px solid var(--border); color:var(--muted); padding:10px 22px; border-radius:10px; cursor:pointer; font-size:14px; }
   .reset:hover { color: var(--text); border-color: var(--accent); }
+
+  .cfgbtn {
+    display:block; margin: 14px auto 0; background:none; border:1px solid var(--border);
+    color:var(--muted); padding:8px 18px; border-radius:10px; cursor:pointer; font-size:13px;
+  }
+  .cfgbtn:hover { color:var(--text); border-color:var(--accent); }
+
+  .modal {
+    display:none; position:fixed; inset:0; background:rgba(4,4,10,.72); z-index:50;
+    align-items:flex-start; justify-content:center; padding:40px 16px; overflow:auto;
+  }
+  .modal.show { display:flex; }
+  .modalcard {
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:24px; width:100%; max-width:460px;
+  }
+  .modalcard h3 { font-size:19px; margin-bottom:4px; }
+  .modalcard .hint { color:var(--muted); font-size:12.5px; margin-bottom:16px; line-height:1.45; }
+  .modalcard label { display:block; font-size:13px; color:var(--muted); margin-bottom:14px; }
+  .modalcard label input, .modalcard label select {
+    display:block; width:100%; margin-top:6px; background:#100f18; color:var(--text);
+    border:1px solid var(--border); border-radius:9px; padding:10px 12px; font-size:14px;
+  }
+  .modalcard label input:focus, .modalcard label select:focus { outline:none; border-color:var(--accent); }
+  .modalmsg { font-size:13px; margin-bottom:14px; min-height:18px; line-height:1.4; }
+  .modalmsg.ok { color:#58e08a; }
+  .modalmsg.bad { color:#ff6b81; }
+  .modalmsg.wait { color:var(--muted); }
+  .modalactions { display:flex; gap:10px; flex-wrap:wrap; }
+  .modalactions button {
+    flex:1; min-width:120px; background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#fff; border:none; border-radius:10px; padding:11px 16px; font-weight:700; font-size:14px; cursor:pointer;
+  }
+  .modalactions button.ghost { flex:0; background:none; border:1px solid var(--border); color:var(--muted); font-weight:600; }
+  .modalactions button.ghost:hover { color:var(--text); border-color:var(--accent); }
+  .modalactions button:disabled { opacity:.6; cursor:default; }
 </style>
 </head>
 <body>
@@ -134,13 +170,15 @@
         <span style="color:var(--muted)">até</span>
         <input type="number" id="maxs" value="60" min="10" max="180" step="1" style="width:64px">
       </label>
-      <label id="llmlabel" title="Usa o Google Gemini para escolher os melhores momentos">
+      <label id="llmlabel" title="Escolha um provedor de IA em Configurar IA">
         <input type="checkbox" id="usellm">
         <span>Seleção por IA <span id="llmhint" style="color:var(--muted)"></span></span>
       </label>
     </div>
     <input type="file" id="file" accept="video/*" hidden>
   </div>
+
+  <button class="cfgbtn" id="cfgbtn" type="button">⚙️ Configurar IA (grátis)</button>
 
   <div class="or">— ou cole um link —</div>
   <div class="linkrow">
@@ -159,6 +197,32 @@
     <div class="stage">Seus clipes ✨</div>
     <div class="grid" id="grid"></div>
     <button class="reset" id="reset">⬅ Processar outro vídeo</button>
+  </div>
+</div>
+
+<div class="modal" id="llmmodal">
+  <div class="modalcard">
+    <h3>⚙️ Seleção por IA</h3>
+    <div class="hint">Escolha um provedor gratuito e cole a chave. Ela fica salva só no seu
+      computador, criptografada (DPAPI). Sem IA o app usa a heurística local normalmente.</div>
+    <label>Provedor
+      <select id="cfgprov"></select>
+    </label>
+    <label>Chave da API
+      <input type="password" id="cfgkey" autocomplete="off" spellcheck="false" placeholder="cole a chave aqui">
+    </label>
+    <label>Modelo
+      <input id="cfgmodel" spellcheck="false" placeholder="modelo padrão do provedor">
+    </label>
+    <label>URL base
+      <input id="cfgbase" spellcheck="false" placeholder="(só para provedores compatíveis com OpenAI)">
+    </label>
+    <div class="modalmsg" id="cfgmsg"></div>
+    <div class="modalactions">
+      <button id="cfgsave" type="button">Salvar e testar</button>
+      <button class="ghost" id="cfgremove" type="button">Remover</button>
+      <button class="ghost" id="cfgclose" type="button">Fechar</button>
+    </div>
   </div>
 </div>
 
@@ -181,11 +245,121 @@ fetch('/api/config').then(r => r.ok ? r.json() : null).then(cfg => {
     document.getElementById('llmhint').textContent = '(' + (cfg.llm_provider || 'IA') + ')';
   } else {
     box.disabled = true;
-    document.getElementById('llmhint').textContent = '(configure ARGOS_LLM_KEY)';
+    document.getElementById('llmhint').textContent = '(clique em Configurar IA)';
   }
   if (cfg.min_clip_s) document.getElementById('mins').value = Math.round(cfg.min_clip_s);
   if (cfg.max_clip_s) document.getElementById('maxs').value = Math.round(cfg.max_clip_s);
 }).catch(() => {});
+
+// ---- Configuração da IA (modal) ------------------------------------------
+let LLM_PROVIDERS = [];
+
+function applyLlmConfig(cfg) {
+  if (!cfg) return;
+  const box = document.getElementById('usellm');
+  if (cfg.available) {
+    box.disabled = false; box.checked = true;
+    document.getElementById('llmhint').textContent = '(' + (cfg.provider || 'IA') + ')';
+  } else {
+    box.disabled = true; box.checked = false;
+    document.getElementById('llmhint').textContent = '(clique em Configurar IA)';
+  }
+  if (cfg.providers) {
+    LLM_PROVIDERS = cfg.providers;
+    const sel = document.getElementById('cfgprov');
+    if (!sel.options.length) {
+      sel.innerHTML = cfg.providers.map(p => '<option value="' + p.id + '">' + p.label + '</option>').join('');
+    }
+  }
+  return cfg;
+}
+
+fetch('/api/llm/config').then(r => r.ok ? r.json() : null).then(applyLlmConfig).catch(() => {});
+
+const modal = document.getElementById('llmmodal');
+const cfgmsg = document.getElementById('cfgmsg');
+const cfgprov = document.getElementById('cfgprov');
+const cfgkey = document.getElementById('cfgkey');
+const cfgmodel = document.getElementById('cfgmodel');
+const cfgbase = document.getElementById('cfgbase');
+
+function provInfo() { return LLM_PROVIDERS.find(p => p.id === cfgprov.value) || null; }
+
+function syncProviderFields(resetValues) {
+  const info = provInfo();
+  cfgkey.placeholder = !info || info.needs_key ? 'cole a chave da API' : 'não precisa de chave (local)';
+  cfgmodel.placeholder = info && info.default_model ? info.default_model : 'modelo padrão do provedor';
+  cfgbase.placeholder = info && info.default_base ? info.default_base : '(só para compatíveis com OpenAI)';
+  if (resetValues) { cfgmodel.value = ''; cfgbase.value = ''; }
+}
+cfgprov.addEventListener('change', () => syncProviderFields(true));
+
+document.getElementById('cfgbtn').addEventListener('click', async () => {
+  cfgmsg.textContent = ''; cfgmsg.className = 'modalmsg';
+  modal.classList.add('show');
+  let cfg = null;
+  try { const r = await fetch('/api/llm/config'); if (r.ok) cfg = await r.json(); } catch {}
+  if (cfg) {
+    applyLlmConfig(cfg);
+    cfgprov.value = cfg.provider || 'gemini';
+    cfgmodel.value = cfg.model || '';
+    cfgbase.value = cfg.base_url || '';
+    cfgkey.value = '';
+    cfgkey.placeholder = cfg.has_key
+      ? '•••••• (chave salva) — deixe em branco para manter'
+      : 'cole a chave da API';
+  }
+  syncProviderFields(false);
+});
+
+document.getElementById('cfgclose').addEventListener('click', () => modal.classList.remove('show'));
+modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('show'); });
+
+function cfgBody() {
+  const b = { provider: cfgprov.value, model: cfgmodel.value.trim(), base_url: cfgbase.value.trim() };
+  if (cfgkey.value.trim()) b.api_key = cfgkey.value.trim();
+  return b;
+}
+
+document.getElementById('cfgsave').addEventListener('click', async () => {
+  const btn = document.getElementById('cfgsave');
+  btn.disabled = true;
+  cfgmsg.className = 'modalmsg wait'; cfgmsg.textContent = 'Salvando e testando...';
+  try {
+    const body = cfgBody();
+    const rs = await fetch('/api/llm/config', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (!rs.ok) {
+      const j = await rs.json().catch(() => ({}));
+      throw new Error(j.detail || ('Erro ' + rs.status));
+    }
+    applyLlmConfig(await rs.json());
+    const rt = await fetch('/api/llm/test', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    const t = await rt.json();
+    cfgmsg.className = 'modalmsg ' + (t.ok ? 'ok' : 'bad');
+    cfgmsg.textContent = (t.ok ? '✅ ' : '❌ ') + t.message;
+    if (t.ok) cfgkey.value = '';
+  } catch (e) {
+    cfgmsg.className = 'modalmsg bad'; cfgmsg.textContent = '❌ ' + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('cfgremove').addEventListener('click', async () => {
+  if (!confirm('Remover a chave e voltar a usar a heurística local?')) return;
+  try {
+    const r = await fetch('/api/llm/config', { method: 'DELETE' });
+    if (r.ok) applyLlmConfig(await r.json());
+    cfgkey.value = ''; cfgmodel.value = ''; cfgbase.value = '';
+    cfgmsg.className = 'modalmsg ok'; cfgmsg.textContent = '✅ Removido.';
+  } catch {
+    cfgmsg.className = 'modalmsg bad'; cfgmsg.textContent = '❌ Falha ao remover.';
+  }
+});
 
 function selOptions() {
   return {

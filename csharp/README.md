@@ -11,6 +11,8 @@ queimada** — tudo **100% local** (Whisper + FFmpeg), sem enviar nada para a nu
 > Esta versão é um app único (servidor local + interface web). Ele sobe em
 > `http://127.0.0.1:8484` e abre o navegador sozinho.
 
+O histórico de mudanças está no [CHANGELOG](../CHANGELOG.pt-BR.md).
+
 ---
 
 ## Requisitos

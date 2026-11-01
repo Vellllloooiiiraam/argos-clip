@@ -8,6 +8,8 @@ version at the repository root is the **legacy client** and is frozen.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+**English** · [Português](CHANGELOG.pt-BR.md)
+
 ## [1.2.1] — 2026-11-01
 
 ### Added

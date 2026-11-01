@@ -13,6 +13,8 @@ karaoke captions** — all **100% local** (Whisper + FFmpeg), nothing sent to th
 > This version is a single app (local server + web UI). It starts on
 > `http://127.0.0.1:8484` and opens the browser by itself.
 
+The change history lives in the [CHANGELOG](../CHANGELOG.md).
+
 ---
 
 ## Requirements

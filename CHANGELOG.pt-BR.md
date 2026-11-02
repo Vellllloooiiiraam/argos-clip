@@ -10,6 +10,13 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
 
 [English](CHANGELOG.md) · **Português**
 
+## [1.4.1] — 2026-11-02
+
+### Alterado
+- **Termos de Uso mais enxutos.** Texto curto, focado no essencial: uso gratuito e
+  sem fins lucrativos por enquanto, proibição de distribuição indevida/revenda,
+  responsabilidade pelo conteúdo, processamento local e ausência de garantias.
+
 ## [1.4.0] — 2026-11-02
 
 ### Adicionado
@@ -140,6 +147,7 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
   Whisper, seleção ciente de frases, reframe 9:16 por rosto, legenda karaoke queimada,
   B-roll opcional), com interface web local.
 
+[1.4.1]: ../../releases/tag/v1.4.1
 [1.4.0]: ../../releases/tag/v1.4.0
 [1.3.0]: ../../releases/tag/v1.3.0
 [1.2.5]: ../../releases/tag/v1.2.5

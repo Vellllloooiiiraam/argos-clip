@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 **English** · [Português](CHANGELOG.pt-BR.md)
 
+## [1.4.1] — 2026-11-02
+
+### Changed
+- **Leaner Terms of Use.** A short text focused on the essentials: free and non-profit
+  for now, improper distribution/resale forbidden, responsibility for the content,
+  local processing and no warranty.
+
 ## [1.4.0] — 2026-11-02
 
 ### Added
@@ -140,6 +147,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   sentence-aware selection, 9:16 face reframe, burned-in karaoke captions, optional
   B-roll), with a local web UI.
 
+[1.4.1]: ../../releases/tag/v1.4.1
 [1.4.0]: ../../releases/tag/v1.4.0
 [1.3.0]: ../../releases/tag/v1.3.0
 [1.2.5]: ../../releases/tag/v1.2.5

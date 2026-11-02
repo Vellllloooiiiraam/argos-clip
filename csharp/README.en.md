@@ -203,7 +203,7 @@ winget install JRSoftware.InnoSetup   :: once
 build-installer.bat
 ```
 
-Produces `installer\out\ArgosClip-Setup-1.4.0.exe` (~194 MB). The installer:
+Produces `installer\out\ArgosClip-Setup-1.4.1.exe` (~194 MB). The installer:
 
 - shows the **Terms of Use and Consent** (you must accept to install);
 - installs **per user** (no admin prompt) into `%LocalAppData%\Programs\Argos Clip`;

@@ -201,10 +201,11 @@ winget install JRSoftware.InnoSetup   :: uma vez só
 build-installer.bat
 ```
 
-Gera `installer\out\ArgosClip-Setup-1.3.0.exe` (~194 MB). O instalador:
+Gera `installer\out\ArgosClip-Setup-1.4.0.exe` (~194 MB). O instalador:
 
+- mostra os **Termos de Uso e Consentimento** (é preciso aceitar para instalar);
 - instala **por usuário** (não pede admin) em `%LocalAppData%\Programs\Argos Clip`;
-- cria atalhos no Menu Iniciar (e Desktop, opcional);
+- cria atalhos no Menu Iniciar (e Desktop, opcional) com o **ícone do app**;
 - inclui o **FFmpeg** dentro de `tools\` (não depende do PC da outra pessoa);
 - instala a runtime do **WebView2** se ela faltar (janela nativa);
 - traz desinstalador; o app é self-contained (não exige .NET instalado).

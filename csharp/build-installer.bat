@@ -65,6 +65,6 @@ if errorlevel 1 (
 )
 
 echo.
-echo Pronto! Instalador em: installer\out\ArgosClip-Setup-1.3.0.exe
+echo Pronto! Instalador em: installer\out\ArgosClip-Setup-1.4.0.exe
 endlocal
 exit /b 0

@@ -1,0 +1,68 @@
+﻿ARGOS CLIP — TERMOS DE USO E CONSENTIMENTO
+==========================================
+
+Leia antes de instalar. Para continuar, marque "Eu aceito os termos".
+
+1. O QUE É
+   O Argos Clip é um aplicativo local que gera clipes curtos a partir de um vídeo
+   longo. Roda no seu computador e não envia seus vídeos para nenhum servidor.
+
+2. GRATUITO E SEM FINS LUCRATIVOS (POR ENQUANTO)
+   Esta versão é distribuída gratuitamente e sem fins lucrativos, no momento.
+   Isso pode mudar no futuro (por exemplo, uma versão paga ou com doações);
+   as versões já publicadas continuam válidas sob os termos com que foram baixadas.
+
+3. DISTRIBUIÇÃO
+   É proibida a distribuição indevida: vender, revender, cobrar pelo download ou
+   redistribuir este aplicativo como se fosse seu, ou removendo os créditos.
+   Compartilhar o instalador original, sem alterações e de graça, é permitido.
+
+4. SUA RESPONSABILIDADE PELO CONTEÚDO
+   Você é o único responsável pelos vídeos que processa ou baixa. Respeite os
+   direitos autorais e os termos de uso das plataformas (YouTube, Twitch, TikTok,
+   Instagram etc.). Não use o app para baixar ou redistribuir conteúdo sem
+   autorização.
+
+5. PRIVACIDADE
+   Todo o processamento é local. Se você configurar uma IA (Gemini, Groq, OpenAI,
+   OpenRouter, Ollama), a transcrição é enviada ao provedor escolhido apenas para
+   a seleção dos momentos; sua chave fica salva e criptografada (DPAPI) só na sua
+   máquina. Sem IA configurada, nada sai do seu computador.
+
+6. SEM GARANTIAS
+   O aplicativo é fornecido "como está", sem garantias de qualquer tipo. Use por
+   sua conta e risco. O autor não se responsabiliza por danos ou pelo uso indevido.
+
+ACEITE
+   Ao marcar "Eu aceito os termos" e instalar, você declara que leu e concorda com
+   estes termos.
+
+-------------------------------------------------------------------------------
+
+ARGOS CLIP — TERMS OF USE AND CONSENT
+
+Read before installing. To continue, check "I accept the terms".
+
+1. WHAT IT IS: a local app that turns a long video into short clips. It runs on
+   your computer and does not upload your videos anywhere.
+
+2. FREE AND NON-PROFIT (FOR NOW): this version is distributed free of charge and
+   without profit at this time. This may change in the future (e.g. a paid version);
+   already-published versions remain valid under the terms they were downloaded with.
+
+3. DISTRIBUTION: improper distribution is forbidden — selling, reselling, charging
+   for the download, or redistributing this app as your own or with the credits
+   removed. Sharing the unmodified original installer for free is allowed.
+
+4. YOUR RESPONSIBILITY: you are solely responsible for the videos you process or
+   download. Respect copyright and the platforms' terms of use.
+
+5. PRIVACY: everything runs locally. If you configure an AI provider, the transcript
+   is sent to the chosen provider only to select the moments; your key is stored
+   encrypted (DPAPI) on your machine. With no AI configured, nothing leaves your PC.
+
+6. NO WARRANTY: the app is provided "as is", without warranties of any kind. Use at
+   your own risk.
+
+By checking "I accept the terms" and installing, you confirm that you have read and
+agree to these terms.

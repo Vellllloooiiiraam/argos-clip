@@ -10,6 +10,17 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
 
 [English](CHANGELOG.md) · **Português**
 
+## [1.4.0] — 2026-11-02
+
+### Adicionado
+- **Termos de Uso e Consentimento** no instalador: antes de instalar, aparece uma
+  página com os termos (uso gratuito e **sem fins lucrativos por enquanto**,
+  proibição de **distribuição indevida**/revenda, privacidade e ausência de
+  garantias). É preciso marcar **“Eu aceito os termos”** para continuar.
+- **Ícone do app (👁️ um olho)** no estilo da interface: aparece no executável, na
+  janela, no atalho, na barra de tarefas e no próprio `Setup.exe`. Gerado por
+  `csharp\scripts\make-icon.ps1` (fonte em `csharp\src\ArgosClip\app.ico`).
+
 ## [1.3.0] — 2026-11-01
 
 ### Adicionado
@@ -129,6 +140,7 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
   Whisper, seleção ciente de frases, reframe 9:16 por rosto, legenda karaoke queimada,
   B-roll opcional), com interface web local.
 
+[1.4.0]: ../../releases/tag/v1.4.0
 [1.3.0]: ../../releases/tag/v1.3.0
 [1.2.5]: ../../releases/tag/v1.2.5
 [1.2.4]: ../../releases/tag/v1.2.4

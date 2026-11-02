@@ -5,7 +5,7 @@
 ; ===========================================================================
 
 #define AppName        "Argos Clip"
-#define AppVersion     "1.3.0"
+#define AppVersion     "1.4.0"
 #define AppPublisher   "Argos Clip"
 #define AppExeName     "argos-clip.exe"
 #define DistDir        "..\dist"
@@ -32,6 +32,11 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayName={#AppName}
 VersionInfoVersion={#AppVersion}
+
+; Icone do app (olho) no setup.exe. O exe do app tambem embute o mesmo icone.
+SetupIconFile={#SourcePath}\..\src\ArgosClip\app.ico
+; Termos & Consentimento: pagina antes de instalar, exige "Eu aceito".
+LicenseFile={#SourcePath}\TERMOS.txt
 
 [Languages]
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"

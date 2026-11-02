@@ -14,6 +14,13 @@ if not defined DOTNET (
 )
 echo Usando: %DOTNET%
 
+REM Icone do app (olho): o app.ico fica versionado, mas geramos se faltar.
+if not exist "src\ArgosClip\app.ico" (
+  echo.
+  echo [0/2] Gerando o icone do app...
+  powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\make-icon.ps1"
+)
+
 echo.
 echo [1/2] Restaurando e compilando (Release)...
 "%DOTNET%" publish "src\ArgosClip\ArgosClip.csproj" -c Release -r win-x64 ^

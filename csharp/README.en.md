@@ -203,10 +203,11 @@ winget install JRSoftware.InnoSetup   :: once
 build-installer.bat
 ```
 
-Produces `installer\out\ArgosClip-Setup-1.3.0.exe` (~194 MB). The installer:
+Produces `installer\out\ArgosClip-Setup-1.4.0.exe` (~194 MB). The installer:
 
+- shows the **Terms of Use and Consent** (you must accept to install);
 - installs **per user** (no admin prompt) into `%LocalAppData%\Programs\Argos Clip`;
-- creates Start Menu (and optional Desktop) shortcuts;
+- creates Start Menu (and optional Desktop) shortcuts with the **app icon**;
 - bundles **FFmpeg** inside `tools\` (doesn't depend on the other person's PC);
 - installs the **WebView2** runtime if it's missing (native window);
 - includes an uninstaller; the app is self-contained (no .NET install required).

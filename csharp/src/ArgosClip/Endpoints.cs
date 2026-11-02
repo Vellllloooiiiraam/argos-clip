@@ -111,7 +111,8 @@ public static class Endpoints
                 form["min_s"].ToString(),
                 form["max_s"].ToString(),
                 form["model"].ToString(),
-                ParseBool(form["use_llm"].ToString()));
+                ParseBool(form["use_llm"].ToString()),
+                form["ai_instructions"].ToString());
 
             var jobId = NewJobId();
             var jobDir = Directory.CreateDirectory(Path.Combine(AppPaths.JobsDir, jobId));
@@ -180,7 +181,8 @@ public static class Endpoints
                     JsonField(root, "min_s"),
                     JsonField(root, "max_s"),
                     JsonField(root, "model"),
-                    ParseBool(JsonField(root, "use_llm")));
+                    ParseBool(JsonField(root, "use_llm")),
+                    JsonField(root, "ai_instructions"));
             }
             catch
             {

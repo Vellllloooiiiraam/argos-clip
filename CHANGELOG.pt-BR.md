@@ -10,6 +10,20 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
 
 [English](CHANGELOG.md) · **Português**
 
+## [1.3.0] — 2026-11-01
+
+### Adicionado
+- **Recado para a IA (💬).** Um campo de texto na tela inicial onde você diz, em
+  linguagem natural, como quer os cortes — ex.: *“faça os cortes terem sentido, com
+  começo, meio e fim, mesmo com 60 segundos”*. O texto vai como **diretriz prioritária**
+  ao prompt da seleção por IA. Vale só quando a **Seleção por IA** está ligada; sem
+  chave/provedor, o app segue pela heurística local.
+
+### Alterado
+- Prompt da IA agora **exige coerência**: cada corte deve fazer sentido sozinho
+  (começar numa frase completa e terminar noutra), sem cortar no meio de um raciocínio
+  nem emendar assuntos diferentes só para preencher a duração.
+
 ## [1.2.5] — 2026-11-01
 
 ### Alterado
@@ -115,6 +129,7 @@ versionamento seguindo [Semantic Versioning](https://semver.org/).
   Whisper, seleção ciente de frases, reframe 9:16 por rosto, legenda karaoke queimada,
   B-roll opcional), com interface web local.
 
+[1.3.0]: ../../releases/tag/v1.3.0
 [1.2.5]: ../../releases/tag/v1.2.5
 [1.2.4]: ../../releases/tag/v1.2.4
 [1.2.3]: ../../releases/tag/v1.2.3

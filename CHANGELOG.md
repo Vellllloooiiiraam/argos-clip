@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 **English** · [Português](CHANGELOG.pt-BR.md)
 
+## [1.3.0] — 2026-11-01
+
+### Added
+- **Note to the AI (💬).** A text field on the home screen where you tell, in plain
+  language, how you want the cuts — e.g. *“make the cuts actually make sense, with a
+  beginning, middle and end, even at 60 seconds”*. The text is sent as a **priority
+  guideline** to the AI selection prompt. It only applies when **AI selection** is on;
+  without a key/provider the app keeps using the local heuristic.
+
+### Changed
+- The AI prompt now **requires coherence**: each cut must stand on its own (start on a
+  full sentence and end on another), without cutting mid-thought or stitching together
+  unrelated subjects just to fill the duration.
+
 ## [1.2.5] — 2026-11-01
 
 ### Changed
@@ -116,6 +130,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   sentence-aware selection, 9:16 face reframe, burned-in karaoke captions, optional
   B-roll), with a local web UI.
 
+[1.3.0]: ../../releases/tag/v1.3.0
 [1.2.5]: ../../releases/tag/v1.2.5
 [1.2.4]: ../../releases/tag/v1.2.4
 [1.2.3]: ../../releases/tag/v1.2.3

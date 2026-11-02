@@ -36,6 +36,15 @@
     padding: 16px 20px; margin-top: 14px;
   }
   .opts { display: flex; gap: 16px; justify-content: center; margin-top: 0; flex-wrap: wrap; }
+  .airant { margin-top: 14px; }
+  .airant label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .airant label .muted { color: var(--muted); opacity: .75; font-weight: 400; }
+  .airant textarea {
+    width: 100%; resize: vertical; min-height: 52px; background: #100f18; color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px;
+    font-family: inherit; line-height: 1.4;
+  }
+  .airant textarea:focus { outline: none; border-color: var(--accent); }
   .opts label { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
   .opts select, .opts input {
     background: #100f18; color: var(--text); border: 1px solid var(--border);
@@ -182,6 +191,14 @@
         <input type="checkbox" id="usellm">
         <span>Seleção por IA <span id="llmhint" style="color:var(--muted)"></span></span>
       </label>
+    </div>
+
+    <div class="airant">
+      <label for="aiinstr">💬 Recado para a IA
+        <span class="muted">(opcional — só vale com “Seleção por IA” ligada)</span>
+      </label>
+      <textarea id="aiinstr" rows="2" maxlength="600" spellcheck="false"
+        placeholder="Ex.: faça os cortes terem sentido — quero trechos com começo, meio e fim, mesmo com 60 s. Evite partes soltas ou que mudam de assunto no meio."></textarea>
     </div>
   </div>
 
@@ -376,6 +393,7 @@ function selOptions() {
     min_s: document.getElementById('mins').value,
     max_s: document.getElementById('maxs').value,
     use_llm: document.getElementById('usellm').checked ? 'true' : 'false',
+    ai_instructions: document.getElementById('aiinstr').value.trim(),
   };
 }
 
@@ -448,6 +466,7 @@ async function startLink(url) {
         min_s: document.getElementById('mins').value,
         max_s: document.getElementById('maxs').value,
         use_llm: document.getElementById('usellm').checked,
+        ai_instructions: document.getElementById('aiinstr').value.trim(),
       }),
     });
   } catch { return showError('Servidor indisponível.'); }

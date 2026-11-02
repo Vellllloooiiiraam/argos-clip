@@ -56,7 +56,7 @@ Opens the app window. Close the window to quit.
 ### 3. Use it
 
 1. **Drag** a video (MP4/MOV/MKV/WEBM/AVI) **or paste a link** (YouTube, Twitch, Vimeo, X, TikTok...).
-2. Adjust the options: number of clips, language, **Whisper model**, **min/max duration** and **AI selection** (if configured).
+2. Adjust the options: number of clips, language, **Whisper model**, **min/max duration**, **AI selection** (if configured) and, optionally, a **💬 note to the AI**.
 3. Wait: transcription → best-moment selection → 9:16 render with captions.
 4. Download the clips right from the page.
 
@@ -83,6 +83,7 @@ sentences and each clip groups whole sentences within
 | **Model** | `small` | Whisper model — `tiny`/`base` are fast; `medium`/`large-v3-turbo` are more accurate (and slower) |
 | **Duration (s)** | 20 to 60 | duration range of each clip |
 | **AI selection** | off | uses AI (Gemini, Groq, OpenAI, Ollama...) to pick the best moments (needs a key/provider — see below) |
+| **💬 Note to the AI** | empty | free text sent with the prompt (e.g. *“make the cuts make sense, with a beginning, middle and end”*). Only applies when **AI selection** is on |
 
 Without AI configured, selection uses the **local heuristic** (hooks, numbers,
 questions, strong opening, speech density). With a provider configured, the AI
@@ -202,7 +203,7 @@ winget install JRSoftware.InnoSetup   :: once
 build-installer.bat
 ```
 
-Produces `installer\out\ArgosClip-Setup-1.2.5.exe` (~194 MB). The installer:
+Produces `installer\out\ArgosClip-Setup-1.3.0.exe` (~194 MB). The installer:
 
 - installs **per user** (no admin prompt) into `%LocalAppData%\Programs\Argos Clip`;
 - creates Start Menu (and optional Desktop) shortcuts;

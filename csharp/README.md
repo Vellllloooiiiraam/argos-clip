@@ -54,7 +54,7 @@ Abre a janela do app. Feche a janela para sair.
 ### 3. Usar
 
 1. **Arraste** um vídeo (MP4/MOV/MKV/WEBM/AVI) **ou cole um link** (YouTube, Twitch, Vimeo, X, TikTok…).
-2. Ajuste as opções: quantidade de clipes, idioma, **modelo do Whisper**, **duração mín/máx** e **seleção por IA** (se configurada).
+2. Ajuste as opções: quantidade de clipes, idioma, **modelo do Whisper**, **duração mín/máx**, **seleção por IA** (se configurada) e, se quiser, um **💬 recado para a IA**.
 3. Aguarde: transcrição → escolha dos melhores momentos → render 9:16 com legenda.
 4. Baixe os clipes na própria tela.
 
@@ -81,6 +81,7 @@ segmentos do Whisper viram frases e cada clipe agrupa frases inteiras dentro de
 | **Modelo** | `small` | modelo do Whisper — `tiny`/`base` são rápidos; `medium`/`large-v3-turbo` são mais precisos (e mais lentos) |
 | **Duração (s)** | 20 até 60 | faixa de duração de cada clipe |
 | **Seleção por IA** | desligada | usa a IA (Gemini, Groq, OpenAI, Ollama...) para escolher os melhores momentos (precisa de chave/provedor — ver abaixo) |
+| **💬 Recado para a IA** | vazio | texto livre que você manda junto no prompt (ex.: *“faça os cortes terem sentido, com começo, meio e fim”*). Vale só com a **Seleção por IA** ligada |
 
 Sem IA configurada, a seleção é a **heurística local** (ganchos, números,
 perguntas, abertura forte, densidade de fala). Com um provedor configurado, a IA
@@ -200,7 +201,7 @@ winget install JRSoftware.InnoSetup   :: uma vez só
 build-installer.bat
 ```
 
-Gera `installer\out\ArgosClip-Setup-1.2.5.exe` (~194 MB). O instalador:
+Gera `installer\out\ArgosClip-Setup-1.3.0.exe` (~194 MB). O instalador:
 
 - instala **por usuário** (não pede admin) em `%LocalAppData%\Programs\Argos Clip`;
 - cria atalhos no Menu Iniciar (e Desktop, opcional);

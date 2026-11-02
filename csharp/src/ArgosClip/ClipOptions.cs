@@ -23,6 +23,12 @@ public sealed record ClipOptions
     /// <summary>Usar seleção por IA quando houver chave/provedor configurado.</summary>
     public bool UseLlm { get; init; }
 
+    /// <summary>
+    /// Instruções livres do usuário para a IA (ex.: "faça os cortes terem sentido").
+    /// Vão como diretriz ao prompt de seleção. Opcional.
+    /// </summary>
+    public string? AiInstructions { get; init; }
+
     /// <summary>Padrões a partir do ambiente (usado quando a UI não manda nada).</summary>
     public static ClipOptions Defaults() => new()
     {
@@ -37,7 +43,8 @@ public sealed record ClipOptions
     /// Monta as opções de uma requisição; campos ausentes/inválidos caem no padrão.
     /// </summary>
     public static ClipOptions FromRequest(
-        int nClips, string? minS, string? maxS, string? model, bool? useLlm)
+        int nClips, string? minS, string? maxS, string? model, bool? useLlm,
+        string? aiInstructions = null)
     {
         var d = Defaults();
         var min = ParseDouble(minS, d.MinLen);
@@ -57,7 +64,20 @@ public sealed record ClipOptions
             MaxLen = max,
             Model = name,
             UseLlm = useLlm ?? d.UseLlm,
+            AiInstructions = SanitizeInstructions(aiInstructions),
         };
+    }
+
+    /// <summary>
+    /// Limpa as instruções do usuário: tira espaços, colapsa linhas repetidas e
+    /// limita o tamanho (é opinião do usuário, vai direto ao prompt da IA).
+    /// </summary>
+    private static string? SanitizeInstructions(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return null;
+        s = System.Text.RegularExpressions.Regex.Replace(s, @"\s+", " ").Trim();
+        if (s.Length > 600) s = s[..600].TrimEnd();
+        return s.Length > 0 ? s : null;
     }
 
     private static double ParseDouble(string? s, double fallback) =>
